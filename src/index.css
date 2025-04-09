@@ -1,0 +1,183 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Wemarka WMAI Brand Colors - Blue */
+    --primary: 220 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-50: 220 100% 95%;
+    --primary-100: 220 100% 90%;
+    --primary-200: 220 90% 80%;
+    --primary-300: 220 85% 70%;
+    --primary-400: 220 80% 60%;
+    --primary-500: 220 70% 50%;
+    --primary-600: 220 65% 45%;
+    --primary-700: 220 60% 40%;
+    --primary-800: 220 55% 35%;
+    --primary-900: 220 50% 30%;
+
+    --secondary: 240 20% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 220 70% 95%;
+    --accent-foreground: 220 70% 40%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 200 98% 39%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 220 70% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 47.4% 11.2%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 47.4% 13.5%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 47.4% 11.2%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Wemarka WMAI Brand Colors - Blue (Dark Mode) */
+    --primary: 220 70% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-50: 220 30% 15%;
+    --primary-100: 220 35% 20%;
+    --primary-200: 220 40% 25%;
+    --primary-300: 220 45% 35%;
+    --primary-400: 220 50% 45%;
+    --primary-500: 220 60% 55%;
+    --primary-600: 220 65% 60%;
+    --primary-700: 220 70% 65%;
+    --primary-800: 220 75% 70%;
+    --primary-900: 220 80% 75%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 220 40% 25%;
+    --accent-foreground: 220 70% 70%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 200 98% 39%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 220 70% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  /* RTL Support */
+  .rtl {
+    direction: rtl;
+    text-align: right;
+  }
+
+  .rtl .ltr-only {
+    display: none;
+  }
+
+  .ltr .rtl-only {
+    display: none;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+  }
+  h1 {
+    @apply text-3xl lg:text-4xl;
+  }
+  h2 {
+    @apply text-2xl lg:text-3xl;
+  }
+  h3 {
+    @apply text-xl lg:text-2xl;
+  }
+  h4 {
+    @apply text-lg lg:text-xl;
+  }
+}
+
+@layer components {
+  .wemarka-card {
+    @apply bg-card text-card-foreground rounded-lg border shadow-card hover:shadow-elevated transition-shadow duration-200;
+  }
+  .wemarka-sidebar-item {
+    @apply flex items-center w-full px-3 py-2 rounded-md cursor-pointer transition-colors;
+  }
+  .wemarka-sidebar-item-active {
+    @apply bg-primary-50 text-primary dark:bg-primary-50 dark:text-primary-700 font-medium;
+  }
+  .wemarka-sidebar-item-inactive {
+    @apply hover:bg-muted text-muted-foreground hover:text-foreground;
+  }
+  .wemarka-module-nav {
+    @apply border-r bg-card/80 shadow-subtle transition-all duration-300 h-full overflow-y-auto;
+  }
+  .wemarka-module-nav-header {
+    @apply h-16 border-b flex items-center px-4 bg-primary/5 justify-between;
+  }
+  .wemarka-module-nav-title {
+    @apply text-lg font-semibold text-primary;
+  }
+  .wemarka-module-nav-back {
+    @apply flex items-center text-primary hover:bg-primary-50 rounded-md px-2 py-1 text-sm;
+  }
+  .wemarka-module-nav-items {
+    @apply p-4 space-y-1;
+  }
+}

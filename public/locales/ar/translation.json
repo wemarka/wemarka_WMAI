@@ -1,0 +1,56 @@
+{
+  "app": {
+    "title": "ويماركا WMAI",
+    "subtitle": "نظام تشغيل الأعمال الموحد"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "register": "التسجيل",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "rememberMe": "تذكرني",
+    "loginWithGoogle": "تسجيل الدخول باستخدام جوجل",
+    "loginWithFacebook": "تسجيل الدخول باستخدام فيسبوك",
+    "loginWithTwitter": "تسجيل الدخول باستخدام تويتر",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟",
+    "signUp": "إنشاء حساب",
+    "signIn": "تسجيل الدخول"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحبًا",
+    "overview": "نظرة عامة",
+    "recentActivity": "النشاط الأخير",
+    "quickActions": "إجراءات سريعة"
+  },
+  "navigation": {
+    "dashboard": "لوحة التحكم",
+    "store": "المتجر",
+    "accounting": "المحاسبة",
+    "marketing": "التسويق",
+    "inbox": "صندوق الوارد",
+    "analytics": "التحليلات",
+    "developer": "المطور",
+    "integrations": "التكاملات",
+    "settings": "الإعدادات"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "view": "عرض",
+    "loading": "جاري التحميل...",
+    "search": "بحث",
+    "notifications": "الإشعارات",
+    "profile": "الملف الشخصي",
+    "logout": "تسجيل الخروج",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح",
+    "language": "اللغة"
+  }
+}
