@@ -9,6 +9,7 @@ import AuthSessionCheck from "@/frontend/modules/auth/components/AuthSessionChec
 
 // Import module dashboards
 import { StoreDashboard } from "@/frontend/modules/store/components/StoreDashboard";
+import { MainDashboard } from "@/frontend/modules/dashboard";
 import AccountingDashboard from "@/frontend/modules/accounting/components/AccountingDashboard";
 import MarketingDashboard from "@/frontend/modules/marketing/components/MarketingDashboard";
 import InboxDashboard from "@/frontend/modules/inbox/components/InboxDashboard";
@@ -87,14 +88,7 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DashboardLayout currentModule="Dashboard">
-                      <div className="space-y-6">
-                        <h1 className="text-2xl font-bold">
-                          Welcome to Wemarka WMAI Dashboard
-                        </h1>
-                        <p className="text-muted-foreground">
-                          Select a module from the sidebar to get started.
-                        </p>
-                      </div>
+                      <MainDashboard />
                     </DashboardLayout>
                   </ProtectedRoute>
                 }

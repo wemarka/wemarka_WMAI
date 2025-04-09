@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Button } from "@/frontend/components/ui/button";
 import {
@@ -14,6 +14,9 @@ import {
   TabsTrigger,
 } from "@/frontend/components/ui/tabs";
 import { Separator } from "@/frontend/components/ui/separator";
+import { useToast } from "@/frontend/components/ui/use-toast";
+import { useLanguage } from "@/frontend/contexts/LanguageContext";
+import { supabase } from "@/lib/supabase";
 import {
   PlusCircle,
   Trash2,
@@ -21,6 +24,10 @@ import {
   Settings,
   Eye,
   Save,
+  Undo2,
+  Redo2,
+  Upload,
+  Globe,
 } from "lucide-react";
 
 // Define section types
@@ -114,15 +121,27 @@ const sectionTemplates = [
 ];
 
 interface HomePageEditorProps {
+  layoutId?: string;
   isRTL?: boolean;
 }
 
-const HomePageEditor = ({ isRTL = false }: HomePageEditorProps) => {
+const HomePageEditor = ({ layoutId, isRTL = false }: HomePageEditorProps) => {
+  const { toast } = useToast();
+  const { direction, language } = useLanguage();
   const [sections, setSections] = useState<Section[]>(initialSections);
   const [activeTab, setActiveTab] = useState("editor");
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(
     null,
   );
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [layoutName, setLayoutName] = useState("Home Page");
+  const [currentLayoutId, setCurrentLayoutId] = useState<string | null>(
+    layoutId || null,
+  );
+
+  // Auto-save timer
+  const autoSaveTimerRef = useRef<number | null>(null);
 
   // Handle drag and drop reordering
   const handleDragEnd = (result: any) => {
@@ -134,6 +153,138 @@ const HomePageEditor = ({ isRTL = false }: HomePageEditorProps) => {
 
     setSections(items);
   };
+
+  // Save layout to Supabase
+  const saveLayout = useCallback(
+    async (isDraft = true) => {
+      setIsSaving(true);
+      try {
+        const layoutData = {
+          name: layoutName,
+          sections: sections,
+        };
+
+        let result;
+        if (currentLayoutId) {
+          // Update existing layout
+          result = await supabase
+            .from("homepage_draft_layouts")
+            .update({
+              sections: layoutData.sections,
+              name: layoutData.name,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", currentLayoutId)
+            .select()
+            .single();
+        } else {
+          // Create new layout
+          result = await supabase
+            .from("homepage_draft_layouts")
+            .insert({
+              name: layoutData.name,
+              sections: layoutData.sections,
+            })
+            .select()
+            .single();
+
+          if (result.data) {
+            setCurrentLayoutId(result.data.id);
+          }
+        }
+
+        if (result.error) {
+          throw result.error;
+        }
+
+        setLastSaved(new Date());
+
+        if (!isDraft) {
+          // Show success message for manual saves
+          toast({
+            title:
+              language === "ar"
+                ? "تم الحفظ بنجاح"
+                : "Layout saved successfully",
+            description: new Date().toLocaleTimeString(),
+          });
+        } else {
+          // Show subtle message for auto-saves
+          toast({
+            title: language === "ar" ? "تم الحفظ مؤقتًا" : "Draft saved",
+            description: new Date().toLocaleTimeString(),
+            variant: "default",
+          });
+        }
+      } catch (error) {
+        console.error("Error saving layout:", error);
+        toast({
+          title: language === "ar" ? "خطأ في الحفظ" : "Error saving layout",
+          description: (error as Error).message,
+          variant: "destructive",
+        });
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [currentLayoutId, layoutName, sections, toast, language],
+  );
+
+  // Auto-save effect
+  useEffect(() => {
+    // Clear any existing timer
+    if (autoSaveTimerRef.current) {
+      window.clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Set a new timer for auto-save (10 seconds)
+    autoSaveTimerRef.current = window.setTimeout(() => {
+      if (sections.length > 0) {
+        saveLayout(true); // true = isDraft
+      }
+    }, 10000);
+
+    // Cleanup on unmount
+    return () => {
+      if (autoSaveTimerRef.current) {
+        window.clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [sections, saveLayout]);
+
+  // Load layout from Supabase
+  useEffect(() => {
+    const loadLayout = async () => {
+      if (currentLayoutId) {
+        try {
+          const { data, error } = await supabase
+            .from("homepage_draft_layouts")
+            .select("*")
+            .eq("id", currentLayoutId)
+            .single();
+
+          if (error) throw error;
+          if (data) {
+            setSections(data.sections);
+            setLayoutName(data.name);
+            setLastSaved(new Date(data.updated_at));
+          }
+        } catch (error) {
+          console.error("Error loading layout:", error);
+          toast({
+            title:
+              language === "ar"
+                ? "خطأ في تحميل التخطيط"
+                : "Error loading layout",
+            description: (error as Error).message,
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    loadLayout();
+  }, [currentLayoutId, toast, language]);
 
   // Add a new section
   const addSection = (templateType: string) => {
@@ -165,31 +316,61 @@ const HomePageEditor = ({ isRTL = false }: HomePageEditorProps) => {
   };
 
   return (
-    <div className="bg-background min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="bg-background min-h-screen" dir={direction}>
       <div className="container mx-auto py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Home Page Editor</h1>
-          <div className="flex space-x-2">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold">
+              {language === "ar" ? "محرر الصفحة الرئيسية" : "Home Page Editor"}
+            </h1>
+            {lastSaved && (
+              <span className="text-xs text-muted-foreground">
+                {language === "ar" ? "آخر حفظ:" : "Last saved:"}{" "}
+                {lastSaved.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
+          <div className="flex space-x-2 rtl:space-x-reverse">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setActiveTab("preview")}
             >
-              <Eye className="mr-2 h-4 w-4" />
-              Preview
+              <Eye
+                className={`${direction === "ltr" ? "mr-2" : "ml-2"} h-4 w-4`}
+              />
+              {language === "ar" ? "معاينة" : "Preview"}
             </Button>
-            <Button size="sm">
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
+            <Button
+              size="sm"
+              onClick={() => saveLayout(false)}
+              disabled={isSaving}
+            >
+              <Save
+                className={`${direction === "ltr" ? "mr-2" : "ml-2"} h-4 w-4`}
+              />
+              {isSaving
+                ? language === "ar"
+                  ? "جاري الحفظ..."
+                  : "Saving..."
+                : language === "ar"
+                  ? "حفظ التغييرات"
+                  : "Save Changes"}
             </Button>
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="editor">Editor</TabsTrigger>
-            <TabsTrigger value="settings">Section Settings</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
+            <TabsTrigger value="editor">
+              {language === "ar" ? "المحرر" : "Editor"}
+            </TabsTrigger>
+            <TabsTrigger value="settings">
+              {language === "ar" ? "إعدادات القسم" : "Section Settings"}
+            </TabsTrigger>
+            <TabsTrigger value="preview">
+              {language === "ar" ? "معاينة" : "Preview"}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="editor" className="space-y-4">

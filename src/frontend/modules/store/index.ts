@@ -10,4 +10,5 @@ export {
   ProductDetail,
   ShoppingCart,
   Checkout,
+  HomePageEditor,
 } from "./components/storefront";
