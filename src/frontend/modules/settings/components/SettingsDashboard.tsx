@@ -12,39 +12,15 @@ interface SettingsDashboardProps {
 
 const SettingsDashboard = ({ isRTL = false }: SettingsDashboardProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "إعدادات المستخدم" : "User Settings"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "إدارة إعدادات المستخدم" : "Manage user settings"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "إعدادات النظام" : "System Settings"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "إدارة إعدادات النظام" : "Manage system settings"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "الأذونات" : "Permissions"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "إدارة أذونات المستخدمين" : "Manage user permissions"}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        {isRTL ? "لوحة الإعدادات" : "Settings Dashboard"}
+      </h1>
+      <p className="text-muted-foreground mb-6">
+        {isRTL
+          ? "مرحبًا بك في لوحة الإعدادات. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة."
+          : "Welcome to the Settings Dashboard. Use the sidebar to navigate between different sections."}
+      </p>
     </div>
   );
 };

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/frontend/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
+import { useSidebar } from "@/frontend/contexts/SidebarContext";
+import { useLanguage } from "@/frontend/contexts/LanguageContext";
 
 interface NavigationItem {
   icon: React.ReactNode;
@@ -28,14 +30,21 @@ const ModuleNavigation = ({
   items,
 }: ModuleNavigationProps) => {
   const navigate = useNavigate();
+  const { closeSubSidebar } = useSidebar();
+  const { direction } = useLanguage();
+  const isRTLFromContext = direction === "rtl";
 
   const handleBackClick = () => {
     if (onBackToDashboard) {
       onBackToDashboard();
     } else {
+      closeSubSidebar();
       navigate("/dashboard");
     }
   };
+
+  // Use isRTL from props if provided, otherwise use from language context
+  const rtl = isRTL !== undefined ? isRTL : isRTLFromContext;
 
   return (
     <div className="w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-800 h-full flex flex-col">
@@ -47,10 +56,10 @@ const ModuleNavigation = ({
           className="text-primary hover:bg-primary-100 dark:hover:bg-primary-900/20 rounded-full"
           onClick={handleBackClick}
         >
-          {isRTL ? (
+          {rtl ? (
             <div className="flex items-center">
               <span className="mr-1 text-xs">
-                {isRTL ? "الرئيسية" : "Dashboard"}
+                {rtl ? "الرئيسية" : "Dashboard"}
               </span>
               <ChevronRight className="h-4 w-4" />
             </div>
@@ -87,7 +96,7 @@ const ModuleNavigation = ({
                   <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     {item.icon}
                   </div>
-                  <span className={isRTL ? "mr-3" : "ml-3"}>{item.label}</span>
+                  <span className={rtl ? "mr-3" : "ml-3"}>{item.label}</span>
                 </a>
               </li>
             ))}

@@ -2,19 +2,49 @@ import * as React from "react";
 
 import { cn } from "@/frontend/lib/utils";
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className,
-    )}
-    {...props}
-  />
-));
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?:
+    | "default"
+    | "hover"
+    | "interactive"
+    | "gradient"
+    | "bordered"
+    | "flat";
+  padding?: "default" | "tight" | "loose" | "none";
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = "default", padding = "default", ...props }, ref) => {
+    const variantStyles = {
+      default: "dashboard-card",
+      hover: "dashboard-card card-hover",
+      interactive:
+        "dashboard-card cursor-pointer hover:border-primary/50 card-hover",
+      gradient: "dashboard-card bg-gradient-to-br from-primary-50 to-accent",
+      bordered: "dashboard-card border-2 border-primary/20",
+      flat: "rounded-xl bg-card text-card-foreground",
+    };
+
+    const paddingStyles = {
+      default: "",
+      tight: "p-3",
+      loose: "p-8",
+      none: "p-0",
+    };
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          variantStyles[variant],
+          paddingStyles[padding],
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 Card.displayName = "Card";
 
 const CardHeader = React.forwardRef<
@@ -31,12 +61,13 @@ CardHeader.displayName = "CardHeader";
 
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLHeadingElement> & { gradient?: boolean }
+>(({ className, gradient = false, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-xl font-semibold leading-none tracking-tight",
+      gradient && "gradient-heading",
       className,
     )}
     {...props}

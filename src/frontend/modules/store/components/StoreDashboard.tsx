@@ -15,42 +15,14 @@ export const StoreDashboard = ({}: StoreDashboardProps) => {
 
   return (
     <div className="flex-1 p-6 overflow-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{isRTL ? "المنتجات" : "Products"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              {isRTL
-                ? "إدارة المنتجات والفئات"
-                : "Manage products and categories"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{isRTL ? "المخزون" : "Inventory"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              {isRTL ? "تتبع وإدارة المخزون" : "Track and manage inventory"}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{isRTL ? "الطلبات" : "Orders"}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              {isRTL ? "إدارة ومتابعة الطلبات" : "Manage and track orders"}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <h1 className="text-2xl font-bold mb-4">
+        {isRTL ? "لوحة المتجر" : "Store Dashboard"}
+      </h1>
+      <p className="text-muted-foreground mb-6">
+        {isRTL
+          ? "مرحبًا بك في لوحة المتجر. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة."
+          : "Welcome to the Store Dashboard. Use the sidebar to navigate between different sections."}
+      </p>
     </div>
   );
 };

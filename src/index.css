@@ -5,104 +5,114 @@
 @layer base {
   :root {
     --background: 210 40% 98%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Wemarka WMAI Brand Colors - Blue */
-    --primary: 220 70% 50%;
-    --primary-foreground: 0 0% 100%;
-    --primary-50: 220 100% 95%;
-    --primary-100: 220 100% 90%;
-    --primary-200: 220 90% 80%;
-    --primary-300: 220 85% 70%;
-    --primary-400: 220 80% 60%;
-    --primary-500: 220 70% 50%;
-    --primary-600: 220 65% 45%;
-    --primary-700: 220 60% 40%;
-    --primary-800: 220 55% 35%;
-    --primary-900: 220 50% 30%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --primary-50: 262 83% 97%;
+    --primary-100: 262 83% 94%;
+    --primary-200: 262 83% 88%;
+    --primary-300: 262 83% 80%;
+    --primary-400: 262 83% 70%;
+    --primary-500: 262 83% 58%;
+    --primary-600: 262 83% 48%;
+    --primary-700: 262 83% 38%;
+    --primary-800: 262 83% 28%;
+    --primary-900: 262 83% 18%;
 
-    --secondary: 240 20% 96%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 220 70% 95%;
-    --accent-foreground: 220 70% 40%;
+    --accent: 262 83% 94%;
+    --accent-foreground: 262 83% 38%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 210 40% 98%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 210 40% 98%;
 
-    --info: 200 98% 39%;
-    --info-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 220 70% 50%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 262 83% 58%;
 
-    --radius: 0.5rem;
+    --radius-sm: 0.3rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.8rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.1);
+    --shadow-hard: 0 10px 30px rgba(0, 0, 0, 0.15);
   }
 
   .dark {
-    --background: 222.2 47.4% 11.2%;
+    --background: 222 47% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 47.4% 13.5%;
+    --card: 222 47% 11%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 47.4% 11.2%;
+    --popover: 222 47% 11%;
     --popover-foreground: 210 40% 98%;
 
-    /* Wemarka WMAI Brand Colors - Blue (Dark Mode) */
-    --primary: 220 70% 60%;
-    --primary-foreground: 0 0% 100%;
-    --primary-50: 220 30% 15%;
-    --primary-100: 220 35% 20%;
-    --primary-200: 220 40% 25%;
-    --primary-300: 220 45% 35%;
-    --primary-400: 220 50% 45%;
-    --primary-500: 220 60% 55%;
-    --primary-600: 220 65% 60%;
-    --primary-700: 220 70% 65%;
-    --primary-800: 220 75% 70%;
-    --primary-900: 220 80% 75%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 210 40% 98%;
+    --primary-50: 262 83% 18%;
+    --primary-100: 262 83% 28%;
+    --primary-200: 262 83% 38%;
+    --primary-300: 262 83% 48%;
+    --primary-400: 262 83% 58%;
+    --primary-500: 262 83% 68%;
+    --primary-600: 262 83% 78%;
+    --primary-700: 262 83% 88%;
+    --primary-800: 262 83% 94%;
+    --primary-900: 262 83% 97%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 199 89% 48%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 18%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 220 40% 25%;
-    --accent-foreground: 220 70% 70%;
+    --accent: 262 83% 28%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
     --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
+    --success-foreground: 210 40% 98%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --warning-foreground: 210 40% 98%;
 
-    --info: 200 98% 39%;
-    --info-foreground: 0 0% 100%;
+    --info: 199 89% 48%;
+    --info-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 220 70% 60%;
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 262 83% 58%;
+
+    --shadow-soft: 0 2px 10px rgba(0, 0, 0, 0.2);
+    --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.3);
+    --shadow-hard: 0 10px 30px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -153,31 +163,15 @@
 }
 
 @layer components {
-  .wemarka-card {
-    @apply bg-card text-card-foreground rounded-lg border shadow-card hover:shadow-elevated transition-shadow duration-200;
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow hover:-translate-y-1;
   }
-  .wemarka-sidebar-item {
-    @apply flex items-center w-full px-3 py-2 rounded-md cursor-pointer transition-colors;
+
+  .gradient-heading {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
   }
-  .wemarka-sidebar-item-active {
-    @apply bg-primary-50 text-primary dark:bg-primary-50 dark:text-primary-700 font-medium;
-  }
-  .wemarka-sidebar-item-inactive {
-    @apply hover:bg-muted text-muted-foreground hover:text-foreground;
-  }
-  .wemarka-module-nav {
-    @apply border-r bg-card/80 shadow-subtle transition-all duration-300 h-full overflow-y-auto;
-  }
-  .wemarka-module-nav-header {
-    @apply h-16 border-b flex items-center px-4 bg-primary/5 justify-between;
-  }
-  .wemarka-module-nav-title {
-    @apply text-lg font-semibold text-primary;
-  }
-  .wemarka-module-nav-back {
-    @apply flex items-center text-primary hover:bg-primary-50 rounded-md px-2 py-1 text-sm;
-  }
-  .wemarka-module-nav-items {
-    @apply p-4 space-y-1;
+
+  .dashboard-card {
+    @apply rounded-xl shadow-sm border border-border/50 bg-card overflow-hidden;
   }
 }

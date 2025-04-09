@@ -52,6 +52,7 @@ import {
   TooltipTrigger,
 } from "@/frontend/components/ui/tooltip";
 import { AIAssistantPanel } from "@/frontend/modules/ai";
+import { useAI } from "@/frontend/contexts/AIContext";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -93,8 +94,15 @@ const DashboardLayoutContent = ({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [rtl, setRtl] = useState(direction === "rtl");
-  const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const {
+    isAIAssistantOpen,
+    currentPrompt,
+    toggleAIAssistant,
+    closeAIAssistant,
+    setCurrentModule,
+  } = useAI();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [searchValue, setSearchValue] = useState("");
 
   // Update time every minute
   useEffect(() => {
@@ -132,13 +140,24 @@ const DashboardLayoutContent = ({
     document.documentElement.dir = rtl ? "ltr" : "rtl";
   };
 
-  const toggleAIPanel = () => {
-    setAiPanelOpen(!aiPanelOpen);
+  // Update current module in AI context when it changes
+  useEffect(() => {
+    setCurrentModule(currentModule);
+  }, [currentModule, setCurrentModule]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Implement search functionality here
+    console.log("Searching for:", searchValue);
   };
 
   return (
     <div
-      className={`flex h-screen bg-gray-50 dark:bg-gray-950 ${darkMode ? "dark" : ""} ${rtl ? "rtl" : "ltr"}`}
+      className={`flex h-screen bg-background dark:bg-gray-950 ${darkMode ? "dark" : ""} ${rtl ? "rtl" : "ltr"}`}
       dir={rtl ? "rtl" : "ltr"}
     >
       {/* Main Sidebar */}
@@ -172,7 +191,7 @@ const DashboardLayoutContent = ({
           </div>
 
           <div className="flex-1 max-w-md mx-auto">
-            <div className="relative">
+            <form onSubmit={handleSearchSubmit} className="relative">
               <Search
                 className={cn(
                   "absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400",
@@ -181,13 +200,15 @@ const DashboardLayoutContent = ({
               />
               <input
                 type="text"
+                value={searchValue}
+                onChange={handleSearch}
                 placeholder={rtl ? "بحث في كل شيء..." : "Search everything..."}
                 className={cn(
                   "py-2 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 h-9 w-full shadow-sm focus:ring-2 focus:ring-primary/30 focus:border-primary focus:outline-none",
                   rtl ? "pr-10 pl-4" : "pl-10 pr-4",
                 )}
               />
-            </div>
+            </form>
           </div>
 
           <div
@@ -389,7 +410,7 @@ const DashboardLayoutContent = ({
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto p-6 bg-gray-50 dark:bg-gray-950">
+        <main className="flex-1 overflow-auto p-6 bg-background dark:bg-gray-950">
           <div className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white dark:bg-gray-900 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
             <div>
               <div className="flex items-center">
@@ -447,12 +468,13 @@ const DashboardLayoutContent = ({
         className={cn(
           "fixed bottom-4 z-50",
           rtl ? "left-4" : "right-4",
-          aiPanelOpen ? "block" : "hidden",
+          isAIAssistantOpen ? "block" : "hidden",
         )}
       >
         <AIAssistantPanel
-          onClose={toggleAIPanel}
+          onClose={closeAIAssistant}
           currentSystem={currentModule}
+          initialPrompt={currentPrompt || undefined}
         />
       </div>
 
@@ -460,9 +482,9 @@ const DashboardLayoutContent = ({
       <div className={cn("fixed bottom-4 z-40", rtl ? "left-4" : "right-4")}>
         <Button
           className="rounded-full h-14 w-14 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all duration-200 hover:scale-105"
-          onClick={toggleAIPanel}
+          onClick={toggleAIAssistant}
         >
-          {aiPanelOpen ? (
+          {isAIAssistantOpen ? (
             <X className="h-6 w-6" />
           ) : (
             <Sparkles className="h-6 w-6" />

@@ -14,47 +14,15 @@ const IntegrationsDashboard = ({
   isRTL = false,
 }: IntegrationsDashboardProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "بوابات الدفع" : "Payment Gateways"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "إدارة بوابات الدفع" : "Manage payment gateways"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {isRTL ? "واجهات برمجة خارجية" : "External APIs"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL
-              ? "إدارة الاتصال بواجهات برمجة خارجية"
-              : "Manage external API connections"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {isRTL ? "منصات الأتمتة" : "Automation Platforms"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL
-              ? "الاتصال بمنصات الأتمتة"
-              : "Connect to automation platforms"}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        {isRTL ? "لوحة التكاملات" : "Integrations Dashboard"}
+      </h1>
+      <p className="text-muted-foreground mb-6">
+        {isRTL
+          ? "مرحبًا بك في لوحة التكاملات. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة."
+          : "Welcome to the Integrations Dashboard. Use the sidebar to navigate between different sections."}
+      </p>
     </div>
   );
 };

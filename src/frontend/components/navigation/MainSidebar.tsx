@@ -13,6 +13,10 @@ import {
   Code,
   Settings,
   ChevronRight,
+  ShoppingBag,
+  HeadphonesIcon,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
@@ -21,6 +25,8 @@ import { useLanguage } from "@/frontend/contexts/LanguageContext";
 interface MainSidebarProps {
   collapsed?: boolean;
   onToggleCollapse?: () => void;
+  isDarkMode?: boolean;
+  toggleDarkMode?: () => void;
 }
 
 interface NavigationItem {
@@ -32,6 +38,8 @@ interface NavigationItem {
 const MainSidebar: React.FC<MainSidebarProps> = ({
   collapsed = false,
   onToggleCollapse,
+  isDarkMode = false,
+  toggleDarkMode,
 }) => {
   const navigate = useNavigate();
   const { direction } = useLanguage();
@@ -50,6 +58,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       path: "/dashboard/store",
     },
     {
+      name: "Storefront",
+      icon: <ShoppingBag className="h-5 w-5" />,
+      path: "/dashboard/storefront",
+    },
+    {
       name: "Accounting",
       icon: <Wallet className="h-5 w-5" />,
       path: "/dashboard/accounting",
@@ -58,6 +71,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       name: "Marketing",
       icon: <Megaphone className="h-5 w-5" />,
       path: "/dashboard/marketing",
+    },
+    {
+      name: "Customer Service",
+      icon: <HeadphonesIcon className="h-5 w-5" />,
+      path: "/dashboard/customer-service",
     },
     {
       name: "Analytics",
@@ -94,37 +112,38 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   return (
     <div
       className={cn(
-        "h-screen bg-white dark:bg-gray-900 border-r dark:border-gray-800 flex flex-col transition-all duration-300",
+        "h-screen bg-card shadow-sm flex flex-col transition-all duration-300 relative z-30",
         collapsed ? "w-20" : "w-64",
       )}
     >
-      <div className="flex items-center h-16 border-b bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/20 justify-between px-4">
+      <div className="flex items-center h-16 border-b bg-gradient-to-r from-primary-600 to-secondary justify-between px-4">
         {!collapsed ? (
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-white font-bold">
+            <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center text-primary font-bold shadow-sm">
               W
             </div>
-            <h1 className="text-lg font-bold text-primary ml-2">Wemarka</h1>
+            <h1 className="text-lg font-bold text-white ml-2">Wemarka</h1>
           </div>
         ) : (
-          <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-white font-bold mx-auto">
+          <div className="h-9 w-9 rounded-xl bg-white flex items-center justify-center text-primary font-bold mx-auto shadow-sm">
             W
           </div>
         )}
         {!collapsed && (
           <Button
             variant="ghost"
-            size="icon"
+            size="icon-sm"
+            rounded="full"
             onClick={onToggleCollapse}
-            className="text-gray-500 hover:text-primary hover:bg-primary-50 rounded-full"
+            className="text-white hover:bg-white/20"
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 px-3">
-        <ul className="space-y-2">
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <ul className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
           {navigationItems.map((item) => {
             const isActive = selectedModule === item.name;
 
@@ -133,10 +152,10 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                 <a
                   href="#"
                   className={cn(
-                    "flex items-center p-2 rounded-lg group transition-all",
+                    "flex items-center p-2.5 rounded-xl group transition-all",
                     isActive
-                      ? "bg-primary-50 text-primary font-medium dark:bg-primary-900/20 dark:text-primary-300"
-                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
+                      ? "bg-primary text-white font-medium shadow-sm"
+                      : "text-foreground hover:bg-primary-50 dark:hover:bg-primary-900/20",
                     collapsed ? "justify-center" : "justify-between",
                   )}
                   onClick={(e) => {
@@ -155,7 +174,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                       collapsed ? "" : "w-full",
                     )}
                   >
-                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-primary-600 dark:text-primary-400">
+                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
                       {item.icon}
                     </div>
                     {!collapsed && (
@@ -166,10 +185,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
                   </div>
                   {!collapsed && item.name !== "Dashboard" && (
                     <ChevronRight
-                      className={cn(
-                        "h-4 w-4 text-gray-500",
-                        isRTL ? "rotate-180" : "",
-                      )}
+                      className={cn("h-4 w-4", isRTL ? "rotate-180" : "")}
                     />
                   )}
                 </a>
@@ -177,28 +193,61 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
             );
           })}
         </ul>
-      </div>
 
-      <div className="p-4 border-t bg-gradient-to-r from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/20">
-        {!collapsed ? (
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            <p className="font-medium text-primary-600 dark:text-primary-400">
-              Wemarka WMAI v1.0.0
-            </p>
-            <p>© 2024 Wemarka</p>
-          </div>
-        ) : (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleCollapse}
-            className="text-gray-500 hover:text-primary hover:bg-primary-50 rounded-full mx-auto flex"
-          >
-            <ChevronRight
-              className={cn("h-5 w-5", isRTL ? "" : "rotate-180")}
-            />
-          </Button>
-        )}
+        <div className="p-3 border-t">
+          {!collapsed ? (
+            <div className="flex flex-col space-y-3">
+              <Button
+                variant="outline"
+                size="sm"
+                rounded="lg"
+                className="w-full justify-start"
+                onClick={toggleDarkMode}
+              >
+                {isDarkMode ? (
+                  <>
+                    <Sun className="h-4 w-4 mr-2" />
+                    {isRTL ? "الوضع الفاتح" : "Light Mode"}
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-4 w-4 mr-2" />
+                    {isRTL ? "الوضع الداكن" : "Dark Mode"}
+                  </>
+                )}
+              </Button>
+              <div className="text-xs text-muted-foreground text-center">
+                <p className="font-medium">Wemarka WMAI v1.0.0</p>
+                <p>© 2024 Wemarka</p>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col space-y-3 items-center">
+              <Button
+                variant="outline"
+                size="icon-sm"
+                rounded="full"
+                onClick={toggleDarkMode}
+              >
+                {isDarkMode ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon-sm"
+                rounded="full"
+                onClick={onToggleCollapse}
+              >
+                <ChevronRight
+                  className={cn("h-4 w-4", isRTL ? "" : "rotate-180")}
+                />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

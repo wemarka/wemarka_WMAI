@@ -3,6 +3,7 @@ import { useRoutes, Routes, Route, Navigate } from "react-router-dom";
 import routes from "tempo-routes";
 import { AuthProvider } from "@/frontend/contexts/AuthContext";
 import { LanguageProvider } from "@/frontend/contexts/LanguageContext";
+import { AIProvider } from "@/frontend/contexts/AIContext";
 import ProtectedRoute from "@/frontend/components/ProtectedRoute";
 import DashboardLayout from "@/frontend/modules/layout/DashboardLayout";
 import AuthSessionCheck from "@/frontend/modules/auth/components/AuthSessionCheck";
@@ -18,6 +19,7 @@ import DocumentsDashboard from "@/frontend/modules/documents/components/Document
 import IntegrationsDashboard from "@/frontend/modules/integrations/components/IntegrationsDashboard";
 import DeveloperDashboard from "@/frontend/modules/developer/components/DeveloperDashboard";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
+import { CustomerServiceDashboard } from "@/frontend/modules/customer-service";
 
 // Lazy load auth components
 const LoginPage = lazy(
@@ -67,191 +69,206 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <AuthSessionCheck />
-        <Suspense fallback={<LoadingFallback />}>
-          <>
-            <Routes>
-              <Route path="/*" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/login/*" element={<LoginPage isRTL={false} />} />
-              <Route
-                path="/register/*"
-                element={<RegisterPage isRTL={false} />}
-              />
-              <Route
-                path="/forgot-password/*"
-                element={<ResetPasswordPage isRTL={false} />}
-              />
-              <Route
-                path="/reset-password/*"
-                element={<NewPasswordPage isRTL={false} />}
-              />
-              <Route
-                path="/dashboard/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Dashboard">
-                      <div>Dashboard Content</div>
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/store/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Store">
-                      <StoreDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/accounting/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Accounting">
-                      <AccountingDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/marketing/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Marketing">
-                      <MarketingDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/inbox/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Inbox">
-                      <InboxDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/analytics/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Analytics">
-                      <AnalyticsDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/customers/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Customers">
-                      <CustomersDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/documents/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Documents">
-                      <DocumentsDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/integrations/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Integrations">
-                      <IntegrationsDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/developer/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Developer">
-                      <DeveloperDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/settings/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Settings">
-                      <SettingsDashboard />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/storefront/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Storefront">
-                      <StorefrontDashboard isRTL={false} />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/storefront/products/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Storefront">
-                      <ProductList isRTL={false} />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/storefront/product/:id/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Storefront">
-                      <ProductDetail isRTL={false} />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/storefront/cart/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Storefront">
-                      <ShoppingCart />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/storefront/checkout/*"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout currentModule="Storefront">
-                      <Checkout />
-                    </DashboardLayout>
-                  </ProtectedRoute>
-                }
-              />
-              {import.meta.env.VITE_TEMPO === "true" && (
-                <Route path="/tempobook/*" />
-              )}
-            </Routes>
-            {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
-          </>
-        </Suspense>
+        <AIProvider>
+          <AuthSessionCheck />
+          <Suspense fallback={<LoadingFallback />}>
+            <>
+              <Routes>
+                <Route
+                  path="/*"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+                <Route path="/login/*" element={<LoginPage isRTL={false} />} />
+                <Route
+                  path="/register/*"
+                  element={<RegisterPage isRTL={false} />}
+                />
+                <Route
+                  path="/forgot-password/*"
+                  element={<ResetPasswordPage isRTL={false} />}
+                />
+                <Route
+                  path="/reset-password/*"
+                  element={<NewPasswordPage isRTL={false} />}
+                />
+                <Route
+                  path="/dashboard/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Dashboard">
+                        <div>Dashboard Content</div>
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/store/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Store">
+                        <StoreDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/accounting/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Accounting">
+                        <AccountingDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/marketing/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Marketing">
+                        <MarketingDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/inbox/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Inbox">
+                        <InboxDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/analytics/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Analytics">
+                        <AnalyticsDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/customers/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Customers">
+                        <CustomersDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/documents/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Documents">
+                        <DocumentsDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/integrations/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Integrations">
+                        <IntegrationsDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/developer/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Developer">
+                        <DeveloperDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/settings/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Settings">
+                        <SettingsDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/customer-service/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Customer Service">
+                        <CustomerServiceDashboard />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/storefront/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Storefront">
+                        <StorefrontDashboard isRTL={false} />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/storefront/products/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Storefront">
+                        <ProductList isRTL={false} />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/storefront/product/:id/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Storefront">
+                        <ProductDetail isRTL={false} />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/storefront/cart/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Storefront">
+                        <ShoppingCart />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/storefront/checkout/*"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout currentModule="Storefront">
+                        <Checkout />
+                      </DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                {import.meta.env.VITE_TEMPO === "true" && (
+                  <Route path="/tempobook/*" />
+                )}
+              </Routes>
+              {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
+            </>
+          </Suspense>
+        </AIProvider>
       </LanguageProvider>
     </AuthProvider>
   );

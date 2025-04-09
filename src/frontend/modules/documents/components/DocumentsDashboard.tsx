@@ -12,41 +12,15 @@ interface DocumentsDashboardProps {
 
 const DocumentsDashboard = ({ isRTL = false }: DocumentsDashboardProps) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "قائمة المستندات" : "Document List"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "عرض وإدارة المستندات" : "View and manage documents"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>{isRTL ? "عارض المستندات" : "Document Viewer"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "عرض وتحرير المستندات" : "View and edit documents"}
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {isRTL ? "قوالب المستندات" : "Document Templates"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">
-            {isRTL ? "إدارة قوالب المستندات" : "Manage document templates"}
-          </p>
-        </CardContent>
-      </Card>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">
+        {isRTL ? "لوحة المستندات" : "Documents Dashboard"}
+      </h1>
+      <p className="text-muted-foreground mb-6">
+        {isRTL
+          ? "مرحبًا بك في لوحة المستندات. استخدم القائمة الجانبية للتنقل بين الأقسام المختلفة."
+          : "Welcome to the Documents Dashboard. Use the sidebar to navigate between different sections."}
+      </p>
     </div>
   );
 };
