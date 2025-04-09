@@ -4,6 +4,8 @@ import { useAuth } from "@/frontend/contexts/AuthContext";
 import { useAI } from "@/frontend/contexts/AIContext";
 import { AIActionButton } from "@/frontend/modules/ai";
 import AIAssistantPanel from "@/frontend/modules/ai/AIAssistantPanel";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 import WidgetGrid from "./WidgetGrid";
 import {
   Card,
@@ -63,6 +65,7 @@ const MainDashboard: React.FC = () => {
   const [filteredModules, setFilteredModules] = useState<DashboardModuleCard[]>(
     [],
   );
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
 
   const displayName = user?.user_metadata?.full_name || "User";
 
@@ -214,6 +217,15 @@ const MainDashboard: React.FC = () => {
     }
   }, [showWelcomeMessage, toast, rtl]);
 
+  // Update clock every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="space-y-8 relative">
       <div
@@ -233,11 +245,24 @@ const MainDashboard: React.FC = () => {
       </div>
       <Toaster />
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">
-          {rtl
-            ? "مرحباً بك في لوحة تحكم Wemarka WMAI"
-            : "Welcome to Wemarka WMAI Dashboard"}
-        </h1>
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="text-3xl font-bold">
+            {rtl
+              ? "مرحباً بك في لوحة تحكم Wemarka WMAI"
+              : "Welcome to Wemarka WMAI Dashboard"}
+          </h1>
+          <div className="text-lg font-medium bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-4 py-2 rounded-lg shadow-sm">
+            {format(
+              currentTime,
+              rtl
+                ? "EEEE، d MMMM yyyy، h:mm:ss a"
+                : "EEEE, d MMMM yyyy, h:mm:ss a",
+              {
+                locale: rtl ? ar : undefined,
+              },
+            )}
+          </div>
+        </div>
         <p className="text-muted-foreground">
           {rtl
             ? `مرحباً ${displayName}، هذه نظرة عامة على أداء عملك.`
@@ -884,4 +909,28 @@ const MainDashboard: React.FC = () => {
                 );
               }}
               label={
-                isLoadingRecomm
+                isLoadingRecommendations
+                  ? rtl
+                    ? "جاري التحليل..."
+                    : "Analyzing..."
+                  : rtl
+                    ? "تحديث التوصيات"
+                    : "Refresh Recommendations"
+              }
+              variant="outline"
+              size="sm"
+              disabled={isLoadingRecommendations}
+              tooltipText={
+                rtl
+                  ? "الحصول على توصيات جديدة بناءً على بياناتك الحالية"
+                  : "Get fresh recommendations based on your current data"
+              }
+            />
+          </CardContent>
+        </Card>
+      </section>
+    </div>
+  );
+};
+
+export default MainDashboard;

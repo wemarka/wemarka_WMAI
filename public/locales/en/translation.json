@@ -38,6 +38,22 @@
     "integrations": "Integrations",
     "settings": "Settings"
   },
+  "ai": {
+    "assistant": "AI Assistant",
+    "chat": "Chat",
+    "history": "History",
+    "settings": "Settings",
+    "suggestions": "AI Suggestions",
+    "prompt": "Type your question here...",
+    "send": "Send",
+    "clear": "Clear",
+    "export": "Export",
+    "noHistory": "No previous conversations. Start a new conversation with the AI assistant.",
+    "openConversation": "Open Conversation",
+    "conversationHistory": "Conversation History",
+    "moduleIntegration": "AI Module Integration",
+    "generate": "Generate"
+  },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -52,5 +68,29 @@
     "darkMode": "Dark Mode",
     "lightMode": "Light Mode",
     "language": "Language"
+  },
+  "rtl": {
+    "showcase": "AI Components with RTL Support",
+    "aiAssistantTabs": "AI Assistant Tabs",
+    "conversationHistory": "Conversation History",
+    "moduleIntegration": "AI Module Integration",
+    "supportNotes": "RTL Support Notes",
+    "textDirection": "Text Direction",
+    "textDirectionDesc": "Right-to-left text direction is automatically applied to all components when toggling language.",
+    "iconPositioning": "Icon Positioning",
+    "iconPositioningDesc": "Icon positions automatically adapt to text direction, ensuring a consistent user experience.",
+    "translations": "Translations",
+    "translationsDesc": "Arabic translations are automatically loaded when toggling language, providing a fully translated experience.",
+    "componentLayout": "Component Layout",
+    "componentLayoutDesc": "Component layouts are automatically mirrored to accommodate RTL direction, including alignment and margins.",
+    "ltrVsRtl": "LTR vs RTL Comparison",
+    "assistant": "Assistant",
+    "history": "History",
+    "integration": "Integration",
+    "bilingualUX": "Bilingual User Experience",
+    "typography": "Typography and Spacing",
+    "typographyDesc": "'Tajawal' font is used for Arabic text to enhance readability. Spacing and margins are automatically adjusted to accommodate text direction.",
+    "uiAdaptation": "UI Adaptation",
+    "uiAdaptationDesc": "The user interface automatically adapts to language direction, including menus, buttons, and forms."
   }
 }
