@@ -1,11 +1,11 @@
-import { Card, CardContent } from "../components/ui/card";
+import { Card, CardContent } from "@/frontend/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "../components/ui/carousel";
+} from "@/frontend/components/ui/carousel";
 
 const meta = {
   title: "ui/Carousel",

@@ -7,6 +7,8 @@ import AIAssistantPanel from "@/frontend/modules/ai/AIAssistantPanel";
 import { format } from "date-fns";
 import { ar } from "date-fns/locale";
 import WidgetGrid from "./WidgetGrid";
+import QuickStats from "./QuickStats";
+import RecentActivity from "./RecentActivity";
 import {
   Card,
   CardContent,
@@ -326,7 +328,32 @@ const MainDashboard: React.FC = () => {
             />
           </div>
         </div>
-        <WidgetGrid />
+        <QuickStats />
+      </section>
+
+      {/* Recent Activity */}
+      <section className="mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">
+            {rtl ? "النشاط الأخير" : "Recent Activity"}
+          </h2>
+          <div className="flex items-center gap-2">
+            <AIActionButton
+              onClick={() => {
+                promptAIAssistant(
+                  "Show me a detailed breakdown of recent activity",
+                );
+              }}
+              label={rtl ? "عرض المزيد" : "View More"}
+              tooltipText={
+                rtl ? "عرض المزيد من النشاطات" : "View more activities"
+              }
+              variant="outline"
+              size="sm"
+            />
+          </div>
+        </div>
+        <RecentActivity />
       </section>
 
       {/* AI Insights Section */}

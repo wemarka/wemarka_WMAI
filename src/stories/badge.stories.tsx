@@ -1,5 +1,5 @@
 // [build] library: 'shadcn'
-import { Badge } from "../components/ui/badge";
+import { Badge } from "@/frontend/components/ui/badge";
 
 const meta = {
   title: "ui/Badge",

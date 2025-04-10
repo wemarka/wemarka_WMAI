@@ -1,6 +1,6 @@
 // [build] library: 'shadcn'
-import { Label } from "../components/ui/label";
-import { Switch } from "../components/ui/switch";
+import { Label } from "@/frontend/components/ui/label";
+import { Switch } from "@/frontend/components/ui/switch";
 
 const meta = {
   title: "ui/Switch",

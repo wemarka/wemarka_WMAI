@@ -13,7 +13,7 @@ import {
   MenubarSubContent,
   MenubarSubTrigger,
   MenubarTrigger,
-} from "../components/ui/menubar";
+} from "@/frontend/components/ui/menubar";
 
 const meta = {
   title: "ui/Menubar",

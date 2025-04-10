@@ -1,12 +1,12 @@
 // [build] library: 'shadcn'
 import { ChevronsUpDown } from "lucide-react";
 
-import { Button } from "../components/ui/button";
+import { Button } from "@/frontend/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "../components/ui/collapsible";
+} from "@/frontend/components/ui/collapsible";
 
 const meta = {
   title: "ui/Collapsible",

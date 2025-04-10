@@ -1,7 +1,7 @@
 // [build] library: 'shadcn'
 
 import { BellIcon, CheckIcon } from "@radix-ui/react-icons";
-import { Button } from "../components/ui/button";
+import { Button } from "@/frontend/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,17 +9,17 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import { Switch } from "../components/ui/switch";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+} from "@/frontend/components/ui/card";
+import { Switch } from "@/frontend/components/ui/switch";
+import { Input } from "@/frontend/components/ui/input";
+import { Label } from "@/frontend/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
+} from "@/frontend/components/ui/select";
 
 const meta = {
   title: "ui/Card",

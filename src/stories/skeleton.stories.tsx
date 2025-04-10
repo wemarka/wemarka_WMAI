@@ -1,6 +1,6 @@
 // [build] library: 'shadcn'
 
-import { Skeleton } from "../components/ui/skeleton";
+import { Skeleton } from "@/frontend/components/ui/skeleton";
 
 const meta = {
   title: "ui/Skeleton",

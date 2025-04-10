@@ -1,13 +1,13 @@
 // [build] library: 'shadcn'
 import { CalendarDays } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Button } from "../components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/frontend/components/ui/avatar";
+import { Button } from "@/frontend/components/ui/button";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "../components/ui/hover-card";
+} from "@/frontend/components/ui/hover-card";
 
 const meta = {
   title: "ui/HoverCard",

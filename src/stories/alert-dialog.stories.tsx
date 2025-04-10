@@ -9,8 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../components/ui/alert-dialog";
-import { Button } from "../components/ui/button";
+} from "@/frontend/components/ui/alert-dialog";
+import { Button } from "@/frontend/components/ui/button";
 
 const meta = {
   title: "ui/AlertDialog",
