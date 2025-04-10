@@ -8,6 +8,8 @@ import {
   BounceRateData,
   AnalyticsSummary,
   AnalyticsFilters,
+  UserAnalytics,
+  AnalyticsFilter,
 } from "@/frontend/types/analytics";
 
 /**
@@ -482,5 +484,230 @@ export const getMockAnalyticsData = (): AnalyticsSummary => {
     conversionRate,
     avgSessionTime,
     bounceRate,
+  };
+};
+
+/**
+ * Get user analytics data for a specific date range
+ * @param startDate Start date for analytics
+ * @param endDate End date for analytics
+ * @returns User analytics data
+ */
+export const getUserAnalytics = async (
+  startDate: Date,
+  endDate: Date,
+): Promise<UserAnalytics> => {
+  try {
+    // In a real implementation, this would fetch from Supabase tables
+    // For now, we'll return mock data
+    return getMockUserAnalytics(startDate, endDate);
+  } catch (error) {
+    console.error("Error fetching user analytics:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get filtered user analytics data
+ * @param filter Analytics filter parameters
+ * @returns Filtered user analytics data
+ */
+export const getFilteredUserAnalytics = async (
+  filter: AnalyticsFilter,
+): Promise<UserAnalytics> => {
+  try {
+    // In a real implementation, this would apply filters to the query
+    // For now, we'll return mock data
+    return getMockUserAnalytics(filter.startDate, filter.endDate);
+  } catch (error) {
+    console.error("Error fetching filtered user analytics:", error);
+    throw error;
+  }
+};
+
+/**
+ * Generate mock user analytics data
+ * @param startDate Start date for analytics
+ * @param endDate End date for analytics
+ * @returns Mock user analytics data
+ */
+const getMockUserAnalytics = (
+  startDate: Date,
+  endDate: Date,
+): UserAnalytics => {
+  // Calculate number of days in the date range
+  const days = Math.ceil(
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+  );
+
+  // Generate daily activity data
+  const dailyActivity = Array.from({ length: days }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    return {
+      date: date.toISOString().split("T")[0],
+      activeUsers: Math.floor(Math.random() * 500) + 100,
+      sessions: Math.floor(Math.random() * 1000) + 200,
+    };
+  });
+
+  // Generate hourly usage data
+  const hourlyUsage = Array.from({ length: 24 }, (_, i) => ({
+    hour: i,
+    avgMinutes: Math.floor(Math.random() * 30) + 5,
+    sessions: Math.floor(Math.random() * 200) + 50,
+  }));
+
+  // Generate module usage data
+  const modules = [
+    "Dashboard",
+    "Store",
+    "Accounting",
+    "Marketing",
+    "Inbox",
+    "Analytics",
+    "Customers",
+    "Documents",
+    "Integrations",
+    "Developer",
+    "Settings",
+  ];
+
+  const moduleUsage = modules.map((module) => ({
+    module,
+    usage: Math.floor(Math.random() * 30) + 1,
+    avgTimeSpent: Math.floor(Math.random() * 30) + 5,
+  }));
+
+  // Normalize module usage percentages to sum to 100
+  const totalUsage = moduleUsage.reduce((sum, item) => sum + item.usage, 0);
+  moduleUsage.forEach((item) => {
+    item.usage = Math.round((item.usage / totalUsage) * 100);
+  });
+
+  // Generate top features data
+  const features = [
+    { name: "Product Management", module: "Store" },
+    { name: "Invoice Creation", module: "Accounting" },
+    { name: "Campaign Analytics", module: "Marketing" },
+    { name: "Customer Chat", module: "Inbox" },
+    { name: "Sales Reports", module: "Analytics" },
+    { name: "User Management", module: "Settings" },
+    { name: "AI Assistant", module: "Dashboard" },
+    { name: "Document Generation", module: "Documents" },
+    { name: "API Integration", module: "Developer" },
+    { name: "Customer Profiles", module: "Customers" },
+  ];
+
+  const topFeatures = features.map((feature) => ({
+    ...feature,
+    usagePercent: Math.floor(Math.random() * 50) + 30,
+  }));
+
+  // Sort top features by usage percentage
+  topFeatures.sort((a, b) => b.usagePercent - a.usagePercent);
+
+  // Generate user growth data
+  const userGrowth = Array.from({ length: days }, (_, i) => {
+    const date = new Date(startDate);
+    date.setDate(date.getDate() + i);
+    return {
+      date: date.toISOString().split("T")[0],
+      newUsers: Math.floor(Math.random() * 50) + 5,
+      activeUsers: Math.floor(Math.random() * 500) + 100,
+    };
+  });
+
+  // Generate retention data
+  const retentionData = [
+    { day: 1, rate: Math.floor(Math.random() * 20) + 70 },
+    { day: 3, rate: Math.floor(Math.random() * 20) + 60 },
+    { day: 7, rate: Math.floor(Math.random() * 20) + 50 },
+    { day: 14, rate: Math.floor(Math.random() * 20) + 40 },
+    { day: 30, rate: Math.floor(Math.random() * 20) + 30 },
+  ];
+
+  // Generate device distribution data
+  const deviceDistribution = [
+    { device: "Desktop", percentage: Math.floor(Math.random() * 30) + 40 },
+    { device: "Mobile", percentage: Math.floor(Math.random() * 20) + 20 },
+    { device: "Tablet", percentage: Math.floor(Math.random() * 10) + 10 },
+  ];
+
+  // Normalize device percentages to sum to 100
+  const totalDevices = deviceDistribution.reduce(
+    (sum, item) => sum + item.percentage,
+    0,
+  );
+  deviceDistribution.forEach((item) => {
+    item.percentage = Math.round((item.percentage / totalDevices) * 100);
+  });
+
+  // Generate browser distribution data
+  const browserDistribution = [
+    { browser: "Chrome", percentage: Math.floor(Math.random() * 20) + 40 },
+    { browser: "Firefox", percentage: Math.floor(Math.random() * 10) + 20 },
+    { browser: "Safari", percentage: Math.floor(Math.random() * 10) + 15 },
+    { browser: "Edge", percentage: Math.floor(Math.random() * 10) + 10 },
+    { browser: "Other", percentage: Math.floor(Math.random() * 5) + 5 },
+  ];
+
+  // Normalize browser percentages to sum to 100
+  const totalBrowsers = browserDistribution.reduce(
+    (sum, item) => sum + item.percentage,
+    0,
+  );
+  browserDistribution.forEach((item) => {
+    item.percentage = Math.round((item.percentage / totalBrowsers) * 100);
+  });
+
+  // Generate country distribution data
+  const countryDistribution = [
+    {
+      country: "United States",
+      percentage: Math.floor(Math.random() * 20) + 30,
+    },
+    {
+      country: "United Kingdom",
+      percentage: Math.floor(Math.random() * 10) + 15,
+    },
+    { country: "Germany", percentage: Math.floor(Math.random() * 10) + 10 },
+    { country: "France", percentage: Math.floor(Math.random() * 5) + 8 },
+    { country: "Canada", percentage: Math.floor(Math.random() * 5) + 7 },
+    { country: "Australia", percentage: Math.floor(Math.random() * 5) + 6 },
+    { country: "Japan", percentage: Math.floor(Math.random() * 5) + 5 },
+    { country: "Brazil", percentage: Math.floor(Math.random() * 3) + 4 },
+    { country: "India", percentage: Math.floor(Math.random() * 3) + 3 },
+    { country: "Saudi Arabia", percentage: Math.floor(Math.random() * 3) + 2 },
+    { country: "Other", percentage: Math.floor(Math.random() * 5) + 5 },
+  ];
+
+  // Normalize country percentages to sum to 100
+  const totalCountries = countryDistribution.reduce(
+    (sum, item) => sum + item.percentage,
+    0,
+  );
+  countryDistribution.forEach((item) => {
+    item.percentage = Math.round((item.percentage / totalCountries) * 100);
+  });
+
+  return {
+    activeUsers: Math.floor(Math.random() * 5000) + 1000,
+    userGrowthRate: Math.floor(Math.random() * 20) + 5,
+    avgSessionDuration: Math.floor(Math.random() * 600) + 300, // 5-15 minutes in seconds
+    sessionDurationChange: Math.floor(Math.random() * 30) - 10, // -10% to +20%
+    engagementRate: Math.floor(Math.random() * 30) + 40, // 40-70%
+    engagementChange: Math.floor(Math.random() * 20) - 5, // -5% to +15%
+    retentionRate: Math.floor(Math.random() * 30) + 50, // 50-80%
+    retentionChange: Math.floor(Math.random() * 20) - 5, // -5% to +15%
+    dailyActivity,
+    hourlyUsage,
+    moduleUsage,
+    topFeatures,
+    userGrowth,
+    retentionData,
+    deviceDistribution,
+    browserDistribution,
+    countryDistribution,
   };
 };

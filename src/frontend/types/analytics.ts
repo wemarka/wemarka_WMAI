@@ -63,3 +63,82 @@ export interface AnalyticsSummary {
   avgSessionTime: number;
   bounceRate: number;
 }
+
+export interface UserAnalytics {
+  // Overview stats
+  activeUsers: number;
+  userGrowthRate: number;
+  avgSessionDuration: number; // in seconds
+  sessionDurationChange: number; // percentage
+  engagementRate: number; // percentage
+  engagementChange: number; // percentage
+  retentionRate: number; // percentage
+  retentionChange: number; // percentage
+
+  // Daily activity
+  dailyActivity: {
+    date: string;
+    activeUsers: number;
+    sessions: number;
+  }[];
+
+  // Hourly usage
+  hourlyUsage: {
+    hour: number;
+    avgMinutes: number;
+    sessions: number;
+  }[];
+
+  // Module usage
+  moduleUsage: {
+    module: string;
+    usage: number; // percentage
+    avgTimeSpent: number; // minutes
+  }[];
+
+  // Top features
+  topFeatures: {
+    name: string;
+    usagePercent: number;
+    module: string;
+  }[];
+
+  // User growth
+  userGrowth: {
+    date: string;
+    newUsers: number;
+    activeUsers: number;
+  }[];
+
+  // Retention data
+  retentionData: {
+    day: number; // day after signup (1, 3, 7, 14, 30)
+    rate: number; // percentage
+  }[];
+
+  // Device distribution
+  deviceDistribution: {
+    device: string;
+    percentage: number;
+  }[];
+
+  // Browser distribution
+  browserDistribution: {
+    browser: string;
+    percentage: number;
+  }[];
+
+  // Country distribution
+  countryDistribution: {
+    country: string;
+    percentage: number;
+  }[];
+}
+
+export interface AnalyticsFilter {
+  startDate: Date;
+  endDate: Date;
+  modules?: string[];
+  userRoles?: string[];
+  countries?: string[];
+}

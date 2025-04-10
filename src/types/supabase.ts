@@ -175,6 +175,41 @@ export type Database = {
         }
         Relationships: []
       }
+      feature_usage: {
+        Row: {
+          created_at: string | null
+          feature: string
+          id: string
+          module: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          feature: string
+          id?: string
+          module: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          feature?: string
+          id?: string
+          module?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_usage_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       homepage_draft_layouts: {
         Row: {
           created_at: string | null
@@ -266,6 +301,44 @@ export type Database = {
             columns: ["draft_id"]
             isOneToOne: false
             referencedRelation: "homepage_draft_layouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      module_access: {
+        Row: {
+          access_time: string
+          created_at: string | null
+          duration: number | null
+          id: string
+          module: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          access_time?: string
+          created_at?: string | null
+          duration?: number | null
+          id?: string
+          module: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          access_time?: string
+          created_at?: string | null
+          duration?: number | null
+          id?: string
+          module?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "module_access_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "user_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -484,36 +557,48 @@ export type Database = {
       }
       user_sessions: {
         Row: {
+          browser: string | null
+          country: string | null
           created_at: string | null
+          device: string | null
+          duration: number | null
           id: string
-          session_duration: number
-          user_id: string | null
+          ip_address: string | null
+          os: string | null
+          session_end: string | null
+          session_start: string
+          user_id: string
         }
         Insert: {
+          browser?: string | null
+          country?: string | null
           created_at?: string | null
+          device?: string | null
+          duration?: number | null
           id?: string
-          session_duration: number
-          user_id?: string | null
+          ip_address?: string | null
+          os?: string | null
+          session_end?: string | null
+          session_start?: string
+          user_id: string
         }
         Update: {
+          browser?: string | null
+          country?: string | null
           created_at?: string | null
+          device?: string | null
+          duration?: number | null
           id?: string
-          session_duration?: number
-          user_id?: string | null
+          ip_address?: string | null
+          os?: string | null
+          session_end?: string | null
+          session_start?: string
+          user_id?: string
         }
         Relationships: []
       }
     }
     Views: {
-      active_users: {
-        Row: {
-          avg_session_time: number | null
-          date: string | null
-          user_count: number | null
-          visit_count: number | null
-        }
-        Relationships: []
-      }
       doc_feedback_stats: {
         Row: {
           doc_id: string | null

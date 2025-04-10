@@ -10,6 +10,7 @@ import DashboardLayout from "@/frontend/modules/layout/DashboardLayout";
 import AuthSessionCheck from "@/frontend/modules/auth/components/AuthSessionCheck";
 import { ToastProvider } from "@/frontend/components/ui/use-toast";
 import StagingEnvironmentNotice from "@/frontend/components/StagingEnvironmentNotice";
+import { userAnalyticsTracker } from "@/frontend/services/userAnalyticsTracker";
 
 // Import dashboard components
 import StoreDashboard from "@/frontend/modules/store/components/StoreDashboard";
@@ -29,6 +30,7 @@ import {
 } from "@/frontend/modules/documentation-center";
 import { HelpCenterDashboard } from "@/frontend/modules/help-center";
 import { MonitoringDashboard } from "@/frontend/modules/developer/components/MonitoringDashboard";
+import { UserAnalyticsDashboard } from "@/frontend/modules/admin";
 
 // Import test panel components
 import StoreTestPanel from "@/frontend/modules/store/components/StoreTestPanel";
@@ -300,6 +302,16 @@ function App() {
                         <ProtectedRoute>
                           <DashboardLayout currentModule="Developer">
                             <MonitoringDashboard isRTL={false} />
+                          </DashboardLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard/admin/user-analytics/*"
+                      element={
+                        <ProtectedRoute>
+                          <DashboardLayout currentModule="Admin">
+                            <UserAnalyticsDashboard isRTL={false} />
                           </DashboardLayout>
                         </ProtectedRoute>
                       }
