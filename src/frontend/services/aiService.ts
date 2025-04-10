@@ -5,6 +5,7 @@ import {
   AIHelpResponse,
   FeedbackType,
 } from "@/frontend/types/ai";
+import WMAIEngine from "./WMAIEngine";
 
 /**
  * Send a question to the AI assistant and get a response
@@ -60,18 +61,8 @@ export const saveConversation = async (
   response: string,
 ): Promise<string | null> => {
   try {
-    const { data, error } = await supabase
-      .from("ai_help_logs")
-      .insert({
-        user_id: userId,
-        question,
-        response,
-      })
-      .select("id")
-      .single();
-
-    if (error) throw error;
-    return data?.id || null;
+    // Use the centralized WMAIEngine to save the prompt
+    return await WMAIEngine.savePrompt(userId, question, response);
   } catch (error) {
     console.error("Error saving conversation:", error);
     // Don't throw here to prevent breaking the user experience
@@ -91,15 +82,19 @@ export const getConversationHistory = async (
   limit: number = 10,
 ): Promise<AIHelpLog[]> => {
   try {
-    const { data, error } = await supabase
-      .from("ai_help_logs")
-      .select("*")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    // Use the centralized WMAIEngine to get prompt history
+    const prompts = await WMAIEngine.getPromptHistory(userId, limit);
 
-    if (error) throw error;
-    return data as AIHelpLog[];
+    // Convert to AIHelpLog format
+    return prompts.map((prompt) => ({
+      id: prompt.id,
+      user_id: prompt.userId,
+      question: prompt.prompt,
+      response: prompt.response,
+      feedback: prompt.feedback,
+      created_at: prompt.createdAt,
+      updated_at: prompt.createdAt, // Use createdAt as fallback
+    }));
   } catch (error) {
     console.error("Error getting conversation history:", error);
     return [];
@@ -128,5 +123,28 @@ export const saveFeedback = async (
     console.error("Error saving feedback:", error);
     // Don't throw here to prevent breaking the user experience
     // Just log the error
+  }
+};
+
+/**
+ * Generate marketing content using AI
+ * @param prompt The content prompt
+ * @param campaignType The type of campaign
+ * @returns Generated marketing content
+ */
+export const generateMarketingContent = async (
+  prompt: string,
+  campaignType: string,
+): Promise<string> => {
+  try {
+    // Enhance the prompt with campaign type context
+    const enhancedPrompt = `Generate ${campaignType} marketing content: ${prompt}`;
+
+    // Call the AI assistant
+    const result = await askAI(enhancedPrompt);
+    return result.response;
+  } catch (error) {
+    console.error("Error generating marketing content:", error);
+    throw new Error("Failed to generate marketing content");
   }
 };

@@ -12,15 +12,21 @@ export interface SystemHealth {
   diskUsage: number; // percentage
 }
 
+export type ErrorSeverity = "critical" | "error" | "warning" | "info";
+
 export interface ErrorLog {
   id: string;
   timestamp: string;
-  level: "error" | "warning" | "info";
+  level: ErrorSeverity;
   message: string;
   source: string;
   stackTrace?: string;
   userId?: string;
   metadata?: Record<string, any>;
+  isBackgroundJob?: boolean;
+  jobType?: string;
+  retryCount?: number;
+  status?: "failed" | "pending" | "completed" | "retrying";
 }
 
 export interface SlowQuery {
@@ -31,6 +37,53 @@ export interface SlowQuery {
   table: string;
   source: string;
   userId?: string;
+  status?: "optimized" | "pending" | "investigating";
+}
+
+export interface ErrorTrend {
+  date: string;
+  critical: number;
+  error: number;
+  warning: number;
+  info: number;
+  total: number;
+}
+
+export interface ModuleError {
+  module: string;
+  critical: number;
+  error: number;
+  warning: number;
+  info: number;
+  total: number;
+}
+
+export interface RepeatedError {
+  id: string;
+  message: string;
+  level: ErrorSeverity;
+  source: string;
+  occurrences: number;
+  firstOccurrence: string;
+  lastOccurrence: string;
+  stackTrace?: string;
+  aiSuggestion?: string;
+  isBackgroundJob?: boolean;
+  status?: string;
+}
+
+export interface SupabaseLog {
+  id: string;
+  timestamp: string;
+  method: string; // GET, POST, etc.
+  event: string; // query, auth, storage, etc.
+  duration?: number;
+  schema: string;
+  table: string;
+  query?: string;
+  error?: string;
+  executionTime?: number;
+  metadata?: Record<string, any>;
 }
 
 export interface UsageMetric {
@@ -62,19 +115,38 @@ export const getSystemHealth = async (): Promise<SystemHealth> => {
 };
 
 /**
- * Get error logs with optional filtering
+ * Get error logs with enhanced filtering
  */
 export const getErrorLogs = async (
   limit: number = 100,
   offset: number = 0,
-  level?: "error" | "warning" | "info",
+  level?: ErrorSeverity,
   startDate?: Date,
   endDate?: Date,
+  source?: string,
 ): Promise<ErrorLog[]> => {
   try {
     // In a real implementation, this would query an error_logs table
-    // For now, we'll return mock data
-    return getMockErrorLogs().slice(offset, offset + limit);
+    let logs = getMockErrorLogs();
+
+    // Apply filters
+    if (level) {
+      logs = logs.filter((log) => log.level === level);
+    }
+
+    if (startDate) {
+      logs = logs.filter((log) => new Date(log.timestamp) >= startDate);
+    }
+
+    if (endDate) {
+      logs = logs.filter((log) => new Date(log.timestamp) <= endDate);
+    }
+
+    if (source) {
+      logs = logs.filter((log) => log.source === source);
+    }
+
+    return logs.slice(offset, offset + limit);
   } catch (error) {
     console.error("Error fetching error logs:", error);
     throw error;
@@ -148,6 +220,236 @@ export const getUsageMetrics = async (
 /**
  * Get module usage statistics
  */
+/**
+ * Get error trends over time
+ */
+export const getErrorTrends = async (
+  startDate: Date,
+  endDate: Date,
+): Promise<ErrorTrend[]> => {
+  try {
+    // In a real implementation, this would query from an analytics table
+    // For now, we'll generate mock data
+    const days = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+    );
+
+    return Array.from({ length: days }, (_, i) => {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      const dateStr = date.toISOString().split("T")[0];
+
+      // Generate random counts with some correlation
+      // More critical errors should generally mean more errors overall
+      const criticalBase = Math.floor(Math.random() * 5);
+      const errorBase = Math.floor(Math.random() * 15) + criticalBase;
+      const warningBase = Math.floor(Math.random() * 30) + errorBase;
+
+      return {
+        date: dateStr,
+        critical: criticalBase,
+        error: errorBase,
+        warning: warningBase,
+        info: Math.floor(Math.random() * 50) + warningBase,
+        total: 0, // Will be calculated below
+      };
+    }).map((day) => ({
+      ...day,
+      total: day.critical + day.error + day.warning + day.info,
+    }));
+  } catch (error) {
+    console.error("Error fetching error trends:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get errors grouped by module
+ */
+export const getErrorsByModule = async (
+  startDate: Date,
+  endDate: Date,
+): Promise<ModuleError[]> => {
+  try {
+    // In a real implementation, this would query from an error_logs table with aggregation
+    // For now, we'll generate mock data based on the modules in the system
+    const modules = [
+      "api",
+      "database",
+      "auth",
+      "frontend",
+      "background-job",
+      "store",
+      "marketing",
+      "analytics",
+      "inbox",
+      "documents",
+    ];
+
+    return modules.map((module) => {
+      // Generate random counts with some correlation
+      const criticalBase = Math.floor(Math.random() * 8);
+      const errorBase = Math.floor(Math.random() * 20) + criticalBase;
+      const warningBase = Math.floor(Math.random() * 40) + errorBase;
+      const infoBase = Math.floor(Math.random() * 60) + warningBase;
+
+      return {
+        module,
+        critical: criticalBase,
+        error: errorBase,
+        warning: warningBase,
+        info: infoBase,
+        total: criticalBase + errorBase + warningBase + infoBase,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching errors by module:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get repeated errors
+ */
+export const getRepeatedErrors = async (
+  startDate: Date,
+  endDate: Date,
+): Promise<RepeatedError[]> => {
+  try {
+    // In a real implementation, this would query from an error_logs table with aggregation
+    // For now, we'll generate mock data
+    const errorMessages = [
+      "Connection timeout",
+      "Database query failed",
+      "Authentication error",
+      "Resource not found",
+      "Permission denied",
+      "Rate limit exceeded",
+      "Internal server error",
+      "Service unavailable",
+    ];
+
+    const sources = ["api", "database", "auth", "frontend", "background-job"];
+
+    return errorMessages.slice(0, 5).map((message, i) => {
+      const level: ErrorSeverity =
+        i === 0 ? "critical" : i < 2 ? "error" : i < 4 ? "warning" : "info";
+
+      const source = sources[i % sources.length];
+      const occurrences = Math.floor(Math.random() * 50) + 5;
+      const isBackgroundJob = source === "background-job";
+
+      // Some errors have AI suggestions
+      const aiSuggestion =
+        i < 3
+          ? i === 0
+            ? "Check network connectivity and increase timeout settings. Verify the database server is responding properly."
+            : i === 1
+              ? "Review the SQL query for syntax errors. Ensure proper indexing on frequently queried columns."
+              : "Verify user credentials and token expiration. Check authentication service status."
+          : undefined;
+
+      return {
+        id: `repeated-${i}`,
+        message,
+        level,
+        source,
+        occurrences,
+        firstOccurrence: new Date(
+          Date.now() - (Math.random() * 10 + 4) * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        lastOccurrence: new Date(
+          Date.now() - Math.random() * 2 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        stackTrace:
+          level === "critical" || level === "error"
+            ? `Error: ${message}\n    at processRequest (${source}.js:42:15)\n    at handleRequest (server.js:123:10)`
+            : undefined,
+        aiSuggestion,
+        isBackgroundJob,
+        status: isBackgroundJob ? "failed" : undefined,
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching repeated errors:", error);
+    throw error;
+  }
+};
+
+/**
+ * Retry a failed background job
+ */
+export const retryFailedJob = async (jobId: string): Promise<boolean> => {
+  try {
+    // In a real implementation, this would call a job queue API or update a database record
+    console.log(`Retrying job ${jobId}`);
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    return true;
+  } catch (error) {
+    console.error(`Error retrying job ${jobId}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Get Supabase logs
+ */
+export const getSupabaseLogs = async (
+  startDate: Date,
+  endDate: Date,
+): Promise<SupabaseLog[]> => {
+  try {
+    // In a real implementation, this would query from Supabase's logging API
+    // For now, we'll generate mock data
+    return Array.from({ length: 50 }, (_, i) => {
+      const methods = ["GET", "POST", "PUT", "DELETE"];
+      const events = ["query", "auth", "storage", "function", "realtime"];
+      const schemas = ["public", "auth", "storage"];
+      const tables = ["users", "profiles", "products", "orders", "logs"];
+
+      const method = methods[Math.floor(Math.random() * methods.length)];
+      const event = events[Math.floor(Math.random() * events.length)];
+      const schema = schemas[Math.floor(Math.random() * schemas.length)];
+      const table = tables[Math.floor(Math.random() * tables.length)];
+
+      const hasError = Math.random() > 0.8;
+      const executionTime = Math.floor(Math.random() * 1000) + 10;
+
+      return {
+        id: `supabase-log-${i}`,
+        timestamp: new Date(
+          startDate.getTime() +
+            Math.random() * (endDate.getTime() - startDate.getTime()),
+        ).toISOString(),
+        method,
+        event,
+        duration: executionTime,
+        schema,
+        table,
+        query:
+          event === "query"
+            ? `SELECT * FROM ${schema}.${table} WHERE id = 'xyz'`
+            : undefined,
+        error: hasError ? "Permission denied for schema public" : undefined,
+        executionTime,
+        metadata: {
+          ip: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+          user_agent:
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          status_code: hasError ? 403 : 200,
+        },
+      };
+    });
+  } catch (error) {
+    console.error("Error fetching Supabase logs:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get module usage statistics
+ */
 export const getModuleUsage = async (): Promise<ModuleUsage[]> => {
   try {
     // In a real implementation, this would query from a module_access table
@@ -177,7 +479,18 @@ const getMockSystemHealth = (): SystemHealth => {
 };
 
 const getMockErrorLogs = (): ErrorLog[] => {
-  const sources = ["api", "database", "auth", "frontend", "background-job"];
+  const sources = [
+    "api",
+    "database",
+    "auth",
+    "frontend",
+    "background-job",
+    "store",
+    "marketing",
+    "analytics",
+    "inbox",
+    "documents",
+  ];
   const errorMessages = [
     "Connection timeout",
     "Database query failed",
@@ -189,41 +502,113 @@ const getMockErrorLogs = (): ErrorLog[] => {
     "Internal server error",
     "Service unavailable",
     "Unexpected error",
+    "Failed to process payment",
+    "Email delivery failed",
+    "File upload error",
+    "API rate limit exceeded",
+    "Invalid configuration",
+    "Database connection lost",
+    "Memory limit exceeded",
+    "Deadlock detected",
+    "SSL certificate error",
+    "Cache invalidation failed",
+  ];
+
+  const jobTypes = [
+    "email-sender",
+    "report-generator",
+    "data-sync",
+    "backup",
+    "image-processing",
   ];
 
   return Array.from({ length: 200 }, (_, i) => {
-    const level =
-      Math.random() > 0.7 ? "error" : Math.random() > 0.5 ? "warning" : "info";
+    // Generate a more realistic distribution of error levels
+    let level: ErrorSeverity;
+    const rand = Math.random();
+    if (rand > 0.95) {
+      level = "critical";
+    } else if (rand > 0.7) {
+      level = "error";
+    } else if (rand > 0.4) {
+      level = "warning";
+    } else {
+      level = "info";
+    }
+
     const source = sources[Math.floor(Math.random() * sources.length)];
     const message =
       errorMessages[Math.floor(Math.random() * errorMessages.length)];
+    const isBackgroundJob = source === "background-job" || Math.random() > 0.8;
+    const jobType = isBackgroundJob
+      ? jobTypes[Math.floor(Math.random() * jobTypes.length)]
+      : undefined;
+    const retryCount = isBackgroundJob
+      ? Math.floor(Math.random() * 3)
+      : undefined;
+
+    // Make some errors appear multiple times to simulate repeated errors
+    const repeatedErrorIndex = Math.floor(i / 20); // Every 20 entries will have the same error
+    const isRepeatedError =
+      i % 20 < 3 && repeatedErrorIndex < errorMessages.length;
+
+    const finalMessage = isRepeatedError
+      ? errorMessages[repeatedErrorIndex]
+      : message;
+
+    const finalSource = isRepeatedError
+      ? sources[repeatedErrorIndex % sources.length]
+      : source;
 
     return {
       id: `error-${i}`,
       timestamp: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
+        Date.now() - Math.random() * 14 * 24 * 60 * 60 * 1000, // Up to 14 days ago
       ).toISOString(),
-      level: level as "error" | "warning" | "info",
-      message,
-      source,
+      level,
+      message: finalMessage,
+      source: finalSource,
       stackTrace:
-        level === "error"
-          ? `Error: ${message}\n    at processRequest (${source}.js:42:15)\n    at handleRequest (server.js:123:10)`
+        level === "critical" || level === "error"
+          ? `Error: ${finalMessage}\n    at processRequest (${finalSource}.js:42:15)\n    at handleRequest (server.js:123:10)\n    at executeMiddleware (middleware.js:45:12)\n    at processNextMiddleware (express.js:67:22)`
           : undefined,
       userId:
         Math.random() > 0.3
           ? `user-${Math.floor(Math.random() * 100)}`
           : undefined,
       metadata: {
-        browser: Math.random() > 0.5 ? "Chrome" : "Firefox",
+        browser:
+          Math.random() > 0.5
+            ? "Chrome"
+            : Math.random() > 0.3
+              ? "Firefox"
+              : "Safari",
         os:
-          Math.random() > 0.7
+          Math.random() > 0.6
             ? "Windows"
-            : Math.random() > 0.5
+            : Math.random() > 0.3
               ? "MacOS"
               : "Linux",
-        url: `/api/${source}/${Math.floor(Math.random() * 10)}`,
+        url: `/api/${finalSource}/${Math.floor(Math.random() * 10)}`,
+        statusCode:
+          level === "error" || level === "critical"
+            ? 500
+            : level === "warning"
+              ? 400
+              : 200,
       },
+      isBackgroundJob,
+      jobType,
+      retryCount,
+      status: isBackgroundJob
+        ? level === "critical" || level === "error"
+          ? "failed"
+          : Math.random() > 0.7
+            ? "completed"
+            : Math.random() > 0.5
+              ? "pending"
+              : "retrying"
+        : undefined,
     };
   });
 };

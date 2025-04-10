@@ -5,6 +5,7 @@ import AIAssistantHistory from "@/frontend/modules/ai/components/AIAssistantHist
 import AIAssistantSettings from "@/frontend/modules/ai/components/AIAssistantSettings";
 import AIAssistantTabs from "@/frontend/modules/ai/components/AIAssistantTabs";
 import AIContextPanel from "@/frontend/modules/ai/components/AIContextPanel";
+import PromptGeneratorAI from "@/frontend/modules/ai/components/PromptGeneratorAI";
 import { useAIAssistant } from "@/frontend/modules/ai/hooks/useAIAssistant";
 import { useAIContextPanel } from "@/frontend/modules/ai/hooks/useAIContextPanel";
 
@@ -16,6 +17,7 @@ export {
   AIAssistantSettings,
   AIAssistantTabs,
   AIContextPanel,
+  PromptGeneratorAI,
   useAIAssistant,
   useAIContextPanel,
 };
