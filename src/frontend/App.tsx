@@ -22,6 +22,19 @@ import DeveloperDashboard from "@/frontend/modules/developer/components/Develope
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
 import { CustomerServiceDashboard } from "@/frontend/modules/customer-service";
 
+// Import test panel components
+import StoreTestPanel from "@/frontend/modules/store/components/StoreTestPanel";
+import AccountingTestPanel from "@/frontend/modules/accounting/components/AccountingTestPanel";
+import MarketingTestPanel from "@/frontend/modules/marketing/components/MarketingTestPanel";
+import InboxTestPanel from "@/frontend/modules/inbox/components/InboxTestPanel";
+import DocumentsTestPanel from "@/frontend/modules/documents/components/DocumentsTestPanel";
+import CustomerServiceTestPanel from "@/frontend/modules/customer-service/components/CustomerServiceTestPanel";
+import IntegrationsTestPanel from "@/frontend/modules/integrations/components/IntegrationsTestPanel";
+import TestCoverageDashboard from "@/frontend/modules/developer/components/TestCoverageDashboard";
+import RTLShowcase from "@/frontend/modules/developer/components/RTLShowcase";
+import DashboardTestPanel from "@/frontend/modules/dashboard/components/DashboardTestPanel";
+import StorefrontTestPanel from "@/frontend/modules/store/components/StorefrontTestPanel";
+
 // Lazy load auth components
 const LoginPage = lazy(
   () => import("@/frontend/modules/auth/components/LoginPage"),
@@ -219,6 +232,108 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+
+                  {/* Test Panel Routes */}
+                  <Route
+                    path="/dashboard/developer/test-coverage/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Developer">
+                          <TestCoverageDashboard isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/developer/rtl-showcase/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Developer">
+                          <RTLShowcase />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/store/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Store">
+                          <StoreTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/accounting/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Accounting">
+                          <AccountingTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/marketing/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Marketing">
+                          <MarketingTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/inbox/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Inbox">
+                          <InboxTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/documents/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Documents">
+                          <DocumentsTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/customer-service/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Customer Service">
+                          <CustomerServiceTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/integrations/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Integrations">
+                          <IntegrationsTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/dashboard/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Dashboard">
+                          <DashboardTestPanel isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
                   <Route
                     path="/dashboard/storefront/*"
                     element={
@@ -275,6 +390,16 @@ function App() {
                       <ProtectedRoute>
                         <DashboardLayout currentModule="Storefront">
                           <HomePageEditor isRTL={false} />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/storefront/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Storefront">
+                          <StorefrontTestPanel isRTL={false} />
                         </DashboardLayout>
                       </ProtectedRoute>
                     }
