@@ -12,12 +12,14 @@ import {
   Clipboard,
   Check,
 } from "lucide-react";
+import { askAI } from "@/frontend/services/aiService";
 
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  isStreaming?: boolean;
 }
 
 interface AIAssistantCoreProps {
@@ -35,6 +37,7 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
   const [input, setInput] = useState(initialPrompt || "");
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [streamedText, setStreamedText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initial greeting message
@@ -48,41 +51,101 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
     setMessages([initialMessage]);
   }, [currentModule]);
 
+  // Process initial prompt if provided
+  useEffect(() => {
+    if (initialPrompt && initialPrompt.trim()) {
+      handleSubmit(new Event("submit") as any, initialPrompt);
+    }
+  }, []);
+
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, streamedText]);
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent, overrideInput?: string) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    const userInput = overrideInput || input;
+    if (!userInput.trim()) return;
 
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
-      content: input,
+      content: userInput,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setStreamedText("");
 
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(input, currentModule);
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: aiResponse,
-        timestamp: new Date(),
-      };
+    // Add placeholder for assistant message with streaming indicator
+    const assistantMessageId = (Date.now() + 1).toString();
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: "assistant",
+      content: "",
+      timestamp: new Date(),
+      isStreaming: true,
+    };
 
-      setMessages((prev) => [...prev, assistantMessage]);
+    setMessages((prev) => [...prev, assistantMessage]);
+
+    try {
+      // Call the AI service with module context
+      const response = await askAI(userInput, currentModule);
+
+      // Simulate streaming effect for the response
+      const fullResponse = response.response;
+      let displayedResponse = "";
+
+      // Update the assistant message with the streaming content
+      for (let i = 0; i < fullResponse.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 15)); // Adjust speed as needed
+        displayedResponse += fullResponse[i];
+        setStreamedText(displayedResponse);
+
+        // Update the message content
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === assistantMessageId
+              ? { ...msg, content: displayedResponse }
+              : msg,
+          ),
+        );
+      }
+
+      // Final update to remove streaming indicator
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? { ...msg, content: fullResponse, isStreaming: false }
+            : msg,
+        ),
+      );
+    } catch (error) {
+      console.error("Error getting AI response:", error);
+
+      // Update the message with an error
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === assistantMessageId
+            ? {
+                ...msg,
+                content:
+                  "Sorry, I encountered an error while processing your request. Please try again.",
+                isStreaming: false,
+              }
+            : msg,
+        ),
+      );
+    } finally {
       setIsLoading(false);
-    }, 1500);
+      setStreamedText("");
+    }
   };
 
   // Copy message to clipboard
@@ -142,6 +205,9 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
               <div className="flex-1">
                 <div className="whitespace-pre-wrap text-sm">
                   {message.content}
+                  {message.isStreaming && (
+                    <span className="inline-block ml-1 animate-pulse">▋</span>
+                  )}
                 </div>
                 <div className="mt-1 flex justify-between items-center">
                   <span className="text-xs opacity-70">
@@ -150,7 +216,7 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
                       minute: "2-digit",
                     })}
                   </span>
-                  {message.role === "assistant" && (
+                  {message.role === "assistant" && !message.isStreaming && (
                     <Button
                       variant="ghost"
                       size="icon-sm"
@@ -171,7 +237,7 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
             </div>
           </div>
         ))}
-        {isLoading && (
+        {isLoading && !messages.some((m) => m.isStreaming) && (
           <div className="flex justify-start">
             <div className="bg-muted text-foreground rounded-xl p-3 flex items-center max-w-[80%] mr-10">
               <Bot className="h-5 w-5 mr-2" />
@@ -198,6 +264,7 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
                 handleSubmit(e);
               }
             }}
+            disabled={isLoading}
           />
           <Button
             type="submit"
@@ -216,95 +283,5 @@ const AIAssistantCore: React.FC<AIAssistantCoreProps> = ({
     </div>
   );
 };
-
-// Helper function to generate AI responses based on the module
-function generateAIResponse(input: string, module: string): string {
-  const lowerInput = input.toLowerCase();
-
-  // Generic responses
-  if (lowerInput.includes("hello") || lowerInput.includes("hi")) {
-    return `Hello! I'm your Wemarka AI assistant for the ${module} module. How can I help you today?`;
-  }
-
-  if (lowerInput.includes("thank")) {
-    return "You're welcome! Is there anything else I can help you with?";
-  }
-
-  // Module-specific responses
-  switch (module) {
-    case "Dashboard":
-      if (lowerInput.includes("kpi") || lowerInput.includes("metrics")) {
-        return "I can help you analyze your key performance indicators. Your sales are up 12% this month, and customer engagement has increased by 8%. Would you like me to generate a detailed report?";
-      }
-      if (lowerInput.includes("summary") || lowerInput.includes("overview")) {
-        return "Here's a quick summary of your business performance:\n\n• Revenue: $24,500 (+15%)\n• New Customers: 142 (+8%)\n• Active Orders: 37\n• Support Tickets: 12 (3 high priority)\n\nWould you like more details on any of these areas?";
-      }
-      break;
-
-    case "Store":
-      if (lowerInput.includes("product") || lowerInput.includes("inventory")) {
-        return "I can help you manage your product inventory. You currently have 5 products with low stock levels that need attention. Would you like me to generate a purchase order for these items?";
-      }
-      if (lowerInput.includes("order") || lowerInput.includes("sales")) {
-        return "You have 37 active orders, with 5 requiring immediate attention due to shipping delays. I can help you prioritize these orders and suggest solutions for the delays.";
-      }
-      break;
-
-    case "Accounting":
-      if (lowerInput.includes("invoice") || lowerInput.includes("payment")) {
-        return "I can help you manage invoices and payments. You have 8 overdue invoices totaling $12,450. Would you like me to generate payment reminder emails for these clients?";
-      }
-      if (lowerInput.includes("expense") || lowerInput.includes("budget")) {
-        return "I've analyzed your expenses and found potential savings of $1,200 monthly by optimizing your subscription services. Would you like to see a detailed breakdown?";
-      }
-      break;
-
-    case "Marketing":
-      if (lowerInput.includes("campaign") || lowerInput.includes("ad")) {
-        return "I can help you optimize your marketing campaigns. Your Facebook campaign is performing 15% better than last month, while your Google Ads have seen a slight decrease. I recommend reallocating 20% of your Google Ads budget to Facebook.";
-      }
-      if (lowerInput.includes("content") || lowerInput.includes("post")) {
-        return "I can help you create engaging content for your marketing channels. Based on your audience demographics, posts about product tutorials and industry insights perform best. Would you like me to generate some content ideas?";
-      }
-      break;
-
-    case "Analytics":
-      if (lowerInput.includes("report") || lowerInput.includes("data")) {
-        return "I can generate custom reports based on your business data. Your customer acquisition cost has decreased by 12% this quarter, and your customer lifetime value has increased by 8%. This indicates your marketing efforts are becoming more efficient.";
-      }
-      if (lowerInput.includes("predict") || lowerInput.includes("forecast")) {
-        return "Based on historical data and current trends, I predict a 15-20% increase in sales for the next quarter. The holiday season and your planned marketing campaigns should contribute significantly to this growth.";
-      }
-      break;
-
-    case "Customers":
-      if (lowerInput.includes("segment") || lowerInput.includes("group")) {
-        return "I've analyzed your customer data and identified 3 key segments:\n\n1. High-value regulars (15% of customers, 40% of revenue)\n2. Occasional big spenders (25% of customers, 30% of revenue)\n3. New customers with growth potential (35% of customers, 20% of revenue)\n\nWould you like personalized marketing strategies for each segment?";
-      }
-      if (lowerInput.includes("retention") || lowerInput.includes("churn")) {
-        return "Your customer retention rate is currently 78%, which is 5% above industry average. I've identified that customers who engage with your email newsletter have 35% lower churn. Would you like me to suggest ways to increase newsletter engagement?";
-      }
-      break;
-
-    case "Inbox":
-      if (lowerInput.includes("email") || lowerInput.includes("message")) {
-        return "I can help you manage your communications. You have 24 unread messages, with 5 marked as high priority. Would you like me to draft responses to the most urgent inquiries?";
-      }
-      if (lowerInput.includes("template") || lowerInput.includes("response")) {
-        return "I can create response templates for common inquiries. Based on your message history, I recommend templates for: product information, shipping updates, and return policies. Would you like me to generate these templates?";
-      }
-      break;
-
-    default:
-      return (
-        "I'm here to help with your business needs. Could you provide more details about what you're looking for in the " +
-        module +
-        " module?"
-      );
-  }
-
-  // Fallback response if no specific match
-  return `I understand you're asking about ${input} in the ${module} module. I can help you analyze data, generate reports, and provide recommendations to optimize your business operations. Could you provide more specific details about what you need?`;
-}
 
 export default AIAssistantCore;

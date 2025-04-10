@@ -9,6 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_help_logs: {
+        Row: {
+          created_at: string | null
+          id: string
+          question: string
+          response: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          question: string
+          response: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          question?: string
+          response?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      docs: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          description: string | null
+          id: string
+          lang: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          lang?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          lang?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          answer: string
+          category: string
+          created_at: string | null
+          id: string
+          lang: string
+          question: string
+          updated_at: string | null
+        }
+        Insert: {
+          answer: string
+          category: string
+          created_at?: string | null
+          id?: string
+          lang?: string
+          question: string
+          updated_at?: string | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          created_at?: string | null
+          id?: string
+          lang?: string
+          question?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       homepage_draft_layouts: {
         Row: {
           created_at: string | null
@@ -31,6 +121,33 @@ export type Database = {
           id?: string
           name?: string
           sections?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      homepage_layouts: {
+        Row: {
+          created_at: string | null
+          id: string
+          layout_data: Json
+          name: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          layout_data: Json
+          name: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          layout_data?: Json
+          name?: string
           updated_at?: string | null
           user_id?: string | null
         }
@@ -77,9 +194,175 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          amount: number
+          created_at: string | null
+          id: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      permissions: {
+        Row: {
+          action: string
+          allowed: boolean | null
+          created_at: string | null
+          id: string
+          module: string
+          role_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          action: string
+          allowed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module: string
+          role_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          allowed?: boolean | null
+          created_at?: string | null
+          id?: string
+          module?: string
+          role_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          category: string
+          created_at: string | null
+          first_response_at: string | null
+          id: string
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          first_response_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          first_response_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          id: string
+          session_duration: number
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          session_duration: number
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          session_duration?: number
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      active_users: {
+        Row: {
+          avg_session_time: number | null
+          date: string | null
+          user_count: number | null
+          visit_count: number | null
+        }
+        Relationships: []
+      }
+      sales_summary: {
+        Row: {
+          avg_order_value: number | null
+          date: string | null
+          order_count: number | null
+          total_amount: number | null
+        }
+        Relationships: []
+      }
+      ticket_response_rate: {
+        Row: {
+          avg_response_time: number | null
+          category: string | null
+          resolution_rate: number | null
+          ticket_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
