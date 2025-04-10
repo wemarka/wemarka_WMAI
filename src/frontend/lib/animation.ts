@@ -24,6 +24,59 @@ export const pageVariants: Variants = {
   },
 };
 
+// Slide transition variants
+export const slideVariants: Variants = {
+  initial: {
+    opacity: 0,
+    x: 20,
+  },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeInOut",
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -20,
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut",
+    },
+  },
+};
+
+// Direction-aware slide variants for RTL/LTR support
+export const getDirectionAwareSlideVariants = (isRTL: boolean): Variants => {
+  const xInitial = isRTL ? -20 : 20;
+  const xExit = isRTL ? 20 : -20;
+
+  return {
+    initial: {
+      opacity: 0,
+      x: xInitial,
+    },
+    animate: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: 0.4,
+        ease: "easeInOut",
+      },
+    },
+    exit: {
+      opacity: 0,
+      x: xExit,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+};
+
 // Card hover variants
 export const cardHoverVariants: Variants = {
   initial: {
@@ -110,78 +163,4 @@ export const fadeInVariants: Variants = {
       duration: 0.3,
     },
   },
-};
-
-// Slide in from right (for sidebars, drawers)
-export const slideInRightVariants: Variants = {
-  initial: {
-    x: "100%",
-  },
-  animate: {
-    x: 0,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut",
-    },
-  },
-  exit: {
-    x: "100%",
-    transition: {
-      duration: 0.2,
-      ease: "easeIn",
-    },
-  },
-};
-
-// Slide in from left (for RTL support)
-export const slideInLeftVariants: Variants = {
-  initial: {
-    x: "-100%",
-  },
-  animate: {
-    x: 0,
-    transition: {
-      duration: 0.3,
-      ease: "easeOut",
-    },
-  },
-  exit: {
-    x: "-100%",
-    transition: {
-      duration: 0.2,
-      ease: "easeIn",
-    },
-  },
-};
-
-// Button press effect
-export const buttonPressVariants: Variants = {
-  initial: {
-    scale: 1,
-  },
-  tap: {
-    scale: 0.97,
-    transition: {
-      duration: 0.1,
-    },
-  },
-};
-
-// Notification bell shake
-export const bellShakeVariants: Variants = {
-  initial: {
-    rotate: 0,
-  },
-  shake: {
-    rotate: [0, 15, -15, 10, -10, 5, -5, 0],
-    transition: {
-      duration: 0.6,
-      ease: "easeInOut",
-    },
-  },
-};
-
-// Get direction-aware variants based on language direction
-export const getDirectionAwareSlideVariants = (isRTL: boolean): Variants => {
-  return isRTL ? slideInLeftVariants : slideInRightVariants;
 };

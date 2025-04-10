@@ -9,6 +9,65 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_development_recommendations: {
+        Row: {
+          analysis_id: string | null
+          category: string
+          code_snippet: string | null
+          created_at: string | null
+          description: string
+          estimated_hours: number | null
+          feedback: string | null
+          id: string
+          implementation_difficulty: string | null
+          priority: string
+          related_module: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          analysis_id?: string | null
+          category: string
+          code_snippet?: string | null
+          created_at?: string | null
+          description: string
+          estimated_hours?: number | null
+          feedback?: string | null
+          id?: string
+          implementation_difficulty?: string | null
+          priority: string
+          related_module?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          analysis_id?: string | null
+          category?: string
+          code_snippet?: string | null
+          created_at?: string | null
+          description?: string
+          estimated_hours?: number | null
+          feedback?: string | null
+          id?: string
+          implementation_difficulty?: string | null
+          priority?: string
+          related_module?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_development_recommendations_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "code_analysis_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_help_logs: {
         Row: {
           created_at: string | null
@@ -106,6 +165,90 @@ export type Database = {
           id?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      code_analysis_results: {
+        Row: {
+          analysis_date: string | null
+          analysis_type: string
+          branch: string | null
+          code_quality_score: number | null
+          code_snippet: string | null
+          created_at: string | null
+          file_path: string | null
+          id: string
+          performance_score: number | null
+          repository_url: string | null
+          security_score: number | null
+          summary: string | null
+          user_id: string | null
+        }
+        Insert: {
+          analysis_date?: string | null
+          analysis_type: string
+          branch?: string | null
+          code_quality_score?: number | null
+          code_snippet?: string | null
+          created_at?: string | null
+          file_path?: string | null
+          id?: string
+          performance_score?: number | null
+          repository_url?: string | null
+          security_score?: number | null
+          summary?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          analysis_date?: string | null
+          analysis_type?: string
+          branch?: string | null
+          code_quality_score?: number | null
+          code_snippet?: string | null
+          created_at?: string | null
+          file_path?: string | null
+          id?: string
+          performance_score?: number | null
+          repository_url?: string | null
+          security_score?: number | null
+          summary?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      development_roadmaps: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          estimated_completion: string | null
+          focus_areas: Json | null
+          id: string
+          risks: Json | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          focus_areas?: Json | null
+          id?: string
+          risks?: Json | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          focus_areas?: Json | null
+          id?: string
+          risks?: Json | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -628,6 +771,97 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      roadmap_phases: {
+        Row: {
+          created_at: string | null
+          dependencies: Json | null
+          description: string | null
+          duration: string | null
+          id: string
+          name: string
+          order_index: number
+          priority: string
+          roadmap_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          name: string
+          order_index: number
+          priority: string
+          roadmap_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dependencies?: Json | null
+          description?: string | null
+          duration?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          priority?: string
+          roadmap_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_phases_roadmap_id_fkey"
+            columns: ["roadmap_id"]
+            isOneToOne: false
+            referencedRelation: "development_roadmaps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roadmap_tasks: {
+        Row: {
+          assignee: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          order_index: number
+          phase_id: string | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          assignee?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          order_index: number
+          phase_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assignee?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number
+          phase_id?: string | null
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_tasks_phase_id_fkey"
+            columns: ["phase_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_phases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       roles: {
         Row: {

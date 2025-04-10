@@ -99,3 +99,6 @@ export const AIProvider: React.FC<AIProviderProps> = ({
 
   return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
 };
+
+// Export AIProvider as AIContextProvider for backward compatibility
+export const AIContextProvider = AIProvider;

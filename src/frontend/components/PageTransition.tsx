@@ -1,11 +1,12 @@
 import React from "react";
-import { AnimatePresence } from "framer-motion";
-import { MotionWrapper } from "@/frontend/components/ui/motion-wrapper";
+import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
+import { pageVariants } from "@/frontend/lib/animation";
 
 interface PageTransitionProps {
   children: React.ReactNode;
   className?: string;
+  disableAnimation?: boolean;
 }
 
 /**
@@ -15,18 +16,27 @@ interface PageTransitionProps {
 export function PageTransition({
   children,
   className = "",
+  disableAnimation = false,
 }: PageTransitionProps) {
   const location = useLocation();
 
+  // If animations are disabled, render without AnimatePresence
+  if (disableAnimation) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <AnimatePresence mode="wait">
-      <MotionWrapper
+      <motion.div
         key={location.pathname}
-        variant="page"
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        variants={pageVariants}
         className={className}
       >
         {children}
-      </MotionWrapper>
+      </motion.div>
     </AnimatePresence>
   );
 }

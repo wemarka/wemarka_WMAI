@@ -1,23 +1,27 @@
-// Simplified toast component for the HomePageEditor
 import { createContext, useContext, useState } from "react";
 
-type ToastVariant = "default" | "destructive";
+export type ToastVariant = "default" | "destructive";
 
-type Toast = {
+export type Toast = {
   id: string;
   title: string;
   description?: string;
   variant?: ToastVariant;
+  duration?: number;
 };
 
-type ToastContextType = {
+export type ToastContextType = {
   toasts: Toast[];
-  toast: (props: Omit<Toast, "id">) => void;
+  toast: (props: Omit<Toast, "id">) => string;
   dismiss: (id: string) => void;
 };
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
+/**
+ * Toast Provider component that manages toast notifications
+ * @param children React children
+ */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -25,15 +29,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     title,
     description,
     variant = "default",
+    duration = 3000,
   }: Omit<Toast, "id">) => {
     const id = Math.random().toString(36).substring(2, 9);
-    const newToast = { id, title, description, variant };
+    const newToast = { id, title, description, variant, duration };
     setToasts((prev) => [...prev, newToast]);
 
-    // Auto dismiss after 3 seconds
-    setTimeout(() => {
-      dismiss(id);
-    }, 3000);
+    // Auto dismiss after specified duration
+    if (duration > 0) {
+      setTimeout(() => {
+        dismiss(id);
+      }, duration);
+    }
 
     return id;
   };
@@ -45,24 +52,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toasts, toast, dismiss }}>
       {children}
-      <div className="fixed bottom-0 right-0 p-4 space-y-2 z-50">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            className={`p-4 rounded-md shadow-md transition-all transform translate-y-0 opacity-100 ${toast.variant === "destructive" ? "bg-destructive text-destructive-foreground" : "bg-background border"}`}
-            onClick={() => dismiss(toast.id)}
-          >
-            <div className="font-medium">{toast.title}</div>
-            {toast.description && (
-              <div className="text-sm opacity-90">{toast.description}</div>
-            )}
-          </div>
-        ))}
-      </div>
     </ToastContext.Provider>
   );
 }
 
+/**
+ * Hook to use toast functionality
+ * @returns Toast context with toast methods
+ */
 export function useToast() {
   const context = useContext(ToastContext);
   if (!context) {

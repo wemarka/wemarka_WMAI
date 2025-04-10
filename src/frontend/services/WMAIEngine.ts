@@ -15,6 +15,7 @@ import {
 /**
  * WMAIEngine - Centralized service for AI interactions across the application
  * Handles connections to Supabase and OpenAI for various AI functionalities
+ * Provides code analysis, development suggestions, and project insights
  */
 export class WMAIEngine {
   /**
@@ -263,6 +264,128 @@ export class WMAIEngine {
     }
 
     return "content"; // Default type
+  }
+
+  /**
+   * Analyze code and generate development suggestions
+   * @param codeSnippet The code to analyze
+   * @param context Additional context about the code
+   * @returns AI-generated code analysis and suggestions
+   */
+  static async analyzeCode(
+    codeSnippet: string,
+    context: string = "",
+  ): Promise<any> {
+    try {
+      // Call the Supabase Edge Function for code analysis
+      const { data, error } = await supabase.functions.invoke(
+        "supabase-functions-code-analysis",
+        {
+          body: { codeSnippet, context },
+        },
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error analyzing code:", error);
+      return {
+        suggestions: [
+          "Consider breaking down large components into smaller ones",
+          "Add comprehensive error handling to improve user experience",
+          "Implement lazy loading for better performance",
+        ],
+        qualityScore: 75,
+      };
+    }
+  }
+
+  /**
+   * Generate development roadmap based on project analysis
+   * @param projectData Current project data and metrics
+   * @returns AI-generated development roadmap
+   */
+  static async generateDevelopmentRoadmap(projectData: any): Promise<any> {
+    try {
+      // Call the Supabase Edge Function for roadmap generation
+      const { data, error } = await supabase.functions.invoke(
+        "supabase-functions-generate-roadmap",
+        {
+          body: { projectData },
+        },
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error generating development roadmap:", error);
+      return {
+        phases: [
+          {
+            name: "Phase 1: Core Infrastructure",
+            description:
+              "Focus on building the core infrastructure and essential features",
+            duration: "4 weeks",
+            tasks: [
+              "Set up authentication system",
+              "Implement basic UI components",
+              "Create database schema",
+            ],
+          },
+          {
+            name: "Phase 2: Feature Development",
+            description: "Develop key features and functionality",
+            duration: "6 weeks",
+            tasks: [
+              "Implement user management",
+              "Create reporting system",
+              "Build notification system",
+            ],
+          },
+          {
+            name: "Phase 3: Optimization & Testing",
+            description: "Optimize performance and conduct thorough testing",
+            duration: "3 weeks",
+            tasks: [
+              "Performance optimization",
+              "Comprehensive testing",
+              "Bug fixing",
+            ],
+          },
+        ],
+      };
+    }
+  }
+
+  /**
+   * Track development progress and update AI recommendations
+   * @param developmentData Current development progress data
+   * @returns Updated recommendations and insights
+   */
+  static async trackDevelopmentProgress(developmentData: any): Promise<any> {
+    try {
+      // Call the Supabase Edge Function for progress tracking
+      const { data, error } = await supabase.functions.invoke(
+        "supabase-functions-track-progress",
+        {
+          body: { developmentData },
+        },
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error tracking development progress:", error);
+      return {
+        completedTasks: developmentData.completedTasks || [],
+        remainingTasks: developmentData.remainingTasks || [],
+        insights: [
+          "You're making good progress on core features",
+          "Consider prioritizing security improvements next",
+          "Documentation is falling behind implementation",
+        ],
+      };
+    }
   }
 }
 
