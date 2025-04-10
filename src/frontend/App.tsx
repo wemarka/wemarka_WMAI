@@ -21,6 +21,10 @@ import IntegrationsDashboard from "@/frontend/modules/integrations/components/In
 import DeveloperDashboard from "@/frontend/modules/developer/components/DeveloperDashboard";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
 import { CustomerServiceDashboard } from "@/frontend/modules/customer-service";
+import {
+  DocumentationCenterDashboard,
+  DocumentationCenterTestPanel,
+} from "@/frontend/modules/documentation-center";
 
 // Import test panel components
 import StoreTestPanel from "@/frontend/modules/store/components/StoreTestPanel";
@@ -228,6 +232,26 @@ function App() {
                       <ProtectedRoute>
                         <DashboardLayout currentModule="Customer Service">
                           <CustomerServiceDashboard />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/documentation/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Documentation">
+                          <DocumentationCenterDashboard />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/documentation/test-panel/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Documentation">
+                          <DocumentationCenterTestPanel isRTL={false} />
                         </DashboardLayout>
                       </ProtectedRoute>
                     }

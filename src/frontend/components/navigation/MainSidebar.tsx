@@ -17,6 +17,7 @@ import {
   HeadphonesIcon,
   Moon,
   Sun,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
@@ -91,6 +92,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       name: "Documents",
       icon: <FileText className="h-5 w-5" />,
       path: "/dashboard/documents",
+    },
+    {
+      name: "Documentation",
+      icon: <BookOpen className="h-5 w-5" />,
+      path: "/dashboard/documentation",
     },
     {
       name: "Integrations",

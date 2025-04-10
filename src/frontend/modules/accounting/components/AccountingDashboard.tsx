@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/frontend/components/ui/card";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
+import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 
 interface AccountingDashboardProps {}
 
@@ -14,7 +15,7 @@ const AccountingDashboard = ({}: AccountingDashboardProps) => {
   const isRTL = direction === "rtl";
 
   return (
-    <div className="flex-1 p-6 overflow-auto">
+    <ModuleLayout moduleName={isRTL ? "المحاسبة" : "Accounting"}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
@@ -51,7 +52,7 @@ const AccountingDashboard = ({}: AccountingDashboardProps) => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </ModuleLayout>
   );
 };
 
