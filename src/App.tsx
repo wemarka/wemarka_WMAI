@@ -226,7 +226,7 @@ function App() {
                 }
               />
               {import.meta.env.VITE_TEMPO === "true" && (
-                <Route path="/tempobook/*" />
+                <Route path="/tempobook/*" element={<div />} />
               )}
             </Routes>
             {import.meta.env.VITE_TEMPO === "true" && useRoutes(routes)}
