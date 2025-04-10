@@ -20,6 +20,7 @@ import {
   BookOpen,
   HelpCircle,
   ShieldAlert,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
@@ -92,6 +93,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       name: "Analytics",
       icon: <FileBarChart className="h-5 w-5" />,
       path: "/dashboard/analytics",
+    },
+    {
+      name: "User Analytics",
+      icon: <BarChart3 className="h-5 w-5" />,
+      path: "/dashboard/admin/user-analytics",
     },
     {
       name: "Customers",

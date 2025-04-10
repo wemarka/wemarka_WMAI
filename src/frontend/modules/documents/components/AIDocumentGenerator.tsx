@@ -54,4 +54,7 @@ Date: ${new Date().toLocaleDateString()}
 
 1. EXECUTIVE SUMMARY
 
-This proposal
+This proposal is intended to outline the scope, goals, and expectations for the upcoming project.
+
+Please review and let us know if you have any feedback.`,
+},

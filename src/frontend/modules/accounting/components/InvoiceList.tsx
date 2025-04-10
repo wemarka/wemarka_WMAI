@@ -9,81 +9,105 @@ import {
 import { Button } from "@/frontend/components/ui/button";
 import { Badge } from "@/frontend/components/ui/badge";
 import { Input } from "@/frontend/components/ui/input";
-import { PlusCircle, Search, Filter, Download, FileText } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/frontend/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/frontend/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/frontend/components/ui/alert-dialog";
+import { useToast } from "@/frontend/components/ui/use-toast";
+import { useInvoices } from "@/frontend/hooks/useInvoices";
+import { Invoice } from "@/frontend/services/accountingService";
+import {
+  PlusCircle,
+  Search,
+  Filter,
+  Download,
+  FileText,
+  Loader2,
+  Eye,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 interface InvoiceListProps {
   isRTL?: boolean;
 }
 
-type InvoiceStatus = "paid" | "unpaid" | "overdue" | "draft";
-
-interface Invoice {
-  id: string;
-  customer: string;
-  amount: number;
-  date: string;
-  dueDate: string;
-  status: InvoiceStatus;
-}
-
 const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"all" | "paid" | "unpaid">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
-  // Mock data for demonstration
-  const invoices: Invoice[] = [
-    {
-      id: "INV-001",
-      customer: "Acme Corp",
-      amount: 1250.0,
-      date: "2023-05-01",
-      dueDate: "2023-05-31",
-      status: "paid",
-    },
-    {
-      id: "INV-002",
-      customer: "Globex Inc",
-      amount: 3450.75,
-      date: "2023-05-05",
-      dueDate: "2023-06-04",
-      status: "unpaid",
-    },
-    {
-      id: "INV-003",
-      customer: "Stark Industries",
-      amount: 8750.5,
-      date: "2023-04-15",
-      dueDate: "2023-05-15",
-      status: "overdue",
-    },
-    {
-      id: "INV-004",
-      customer: "Wayne Enterprises",
-      amount: 4200.25,
-      date: "2023-05-10",
-      dueDate: "2023-06-09",
-      status: "draft",
-    },
-  ];
+  // Fetch invoices using React Query
+  const {
+    data: invoices,
+    isLoading,
+    isError,
+    error,
+    createInvoice,
+    updateInvoice,
+    deleteInvoice,
+    isCreating,
+    isUpdating,
+    isDeleting,
+  } = useInvoices();
 
-  const filteredInvoices = invoices.filter((invoice) => {
-    // Filter by tab
-    if (activeTab === "paid" && invoice.status !== "paid") return false;
-    if (activeTab === "unpaid" && invoice.status === "paid") return false;
+  // Filter invoices based on search query and active tab
+  const filteredInvoices = invoices
+    ? invoices.filter((invoice) => {
+        // Filter by tab
+        if (activeTab === "paid" && invoice.status !== "paid") return false;
+        if (activeTab === "unpaid" && invoice.status === "paid") return false;
 
-    // Filter by search query
-    if (
-      searchQuery &&
-      !invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      !invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
-    ) {
-      return false;
+        // Filter by search query
+        if (
+          searchQuery &&
+          !invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) &&
+          !invoice.id.toLowerCase().includes(searchQuery.toLowerCase())
+        ) {
+          return false;
+        }
+
+        return true;
+      })
+    : [];
+
+  // Handle invoice deletion
+  const handleDeleteInvoice = () => {
+    if (selectedInvoice) {
+      deleteInvoice(selectedInvoice.id);
+      setIsDeleteDialogOpen(false);
+      setSelectedInvoice(null);
     }
+  };
 
-    return true;
-  });
-
-  const getStatusBadge = (status: InvoiceStatus) => {
+  // Get status badge
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "paid":
         return (
@@ -110,8 +134,17 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
           </Badge>
         );
       default:
-        return null;
+        return (
+          <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">
+            {status}
+          </Badge>
+        );
     }
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -120,7 +153,7 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
         <h1 className="text-2xl font-bold">
           {isRTL ? "قائمة الفواتير" : "Invoice List"}
         </h1>
-        <Button>
+        <Button onClick={() => setIsCreateDialogOpen(true)}>
           <PlusCircle className="h-4 w-4 mr-2" />
           {isRTL ? "إنشاء فاتورة" : "Create Invoice"}
         </Button>
@@ -171,7 +204,18 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
       </div>
 
       <div className="space-y-4">
-        {filteredInvoices.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-8">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2">
+              {isRTL ? "جاري التحميل..." : "Loading..."}
+            </span>
+          </div>
+        ) : isError ? (
+          <div className="text-center py-8 text-destructive">
+            {error?.message || (isRTL ? "حدث خطأ" : "An error occurred")}
+          </div>
+        ) : filteredInvoices.length === 0 ? (
           <div className="text-center py-8">
             <FileText className="mx-auto h-12 w-12 text-muted-foreground opacity-50" />
             <h3 className="mt-4 text-lg font-medium">
@@ -193,7 +237,7 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
                       {invoice.customer}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
-                      {invoice.id}
+                      {invoice.id.substring(0, 8)}
                     </p>
                   </div>
                   <div className="text-right">
@@ -206,13 +250,14 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
                 <div className="flex justify-between text-sm">
                   <div>
                     <p className="text-muted-foreground">
-                      {isRTL ? "تاريخ الإصدار" : "Issue Date"}: {invoice.date}
+                      {isRTL ? "تاريخ الإصدار" : "Issue Date"}:{" "}
+                      {formatDate(invoice.date)}
                     </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">
                       {isRTL ? "تاريخ الاستحقاق" : "Due Date"}:{" "}
-                      {invoice.dueDate}
+                      {formatDate(invoice.dueDate)}
                     </p>
                   </div>
                 </div>
@@ -226,7 +271,19 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
                     {isRTL ? "تحرير" : "Edit"}
                   </Button>
                   {invoice.status !== "paid" && (
-                    <Button size="sm">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        updateInvoice({
+                          id: invoice.id,
+                          invoice: { status: "paid" },
+                        });
+                      }}
+                      disabled={isUpdating}
+                    >
+                      {isUpdating ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : null}
                       {isRTL ? "تسجيل الدفع" : "Record Payment"}
                     </Button>
                   )}
@@ -236,6 +293,41 @@ const InvoiceList = ({ isRTL = false }: InvoiceListProps) => {
           ))
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isRTL ? "هل أنت متأكد؟" : "Are you sure?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isRTL
+                ? `هل أنت متأكد من حذف الفاتورة "${selectedInvoice?.id?.substring(0, 8)}"؟ لا يمكن التراجع عن هذا الإجراء.`
+                : `Are you sure you want to delete invoice "${selectedInvoice?.id?.substring(0, 8)}"? This action cannot be undone.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{isRTL ? "إلغاء" : "Cancel"}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteInvoice}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {isRTL ? "جاري الحذف..." : "Deleting..."}
+                </>
+              ) : (
+                <>{isRTL ? "حذف" : "Delete"}</>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

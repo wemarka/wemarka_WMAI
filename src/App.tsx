@@ -19,6 +19,7 @@ import DocumentsDashboard from "@/frontend/modules/documents/components/Document
 import IntegrationsDashboard from "@/frontend/modules/integrations/components/IntegrationsDashboard";
 import DeveloperDashboard from "@/frontend/modules/developer/components/DeveloperDashboard";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
+import UserAnalyticsDashboard from "@/frontend/modules/admin/components/UserAnalyticsDashboard";
 
 // Lazy load home component
 const Home = lazy(() => import("@/frontend/components/Home"));
@@ -189,6 +190,16 @@ function App() {
                   <ProtectedRoute>
                     <DashboardLayout currentModule="Settings">
                       <SettingsDashboard isRTL={false} />
+                    </DashboardLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/user-analytics/*"
+                element={
+                  <ProtectedRoute requiredModule="User Analytics">
+                    <DashboardLayout currentModule="User Analytics">
+                      <UserAnalyticsDashboard isRTL={false} />
                     </DashboardLayout>
                   </ProtectedRoute>
                 }
