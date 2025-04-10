@@ -8,9 +8,16 @@ import {
 import { Card, CardContent } from "@/frontend/components/ui/card";
 import { Badge } from "@/frontend/components/ui/badge";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
-import { getAllFAQs, getFAQCategories } from "@/frontend/services/faqService";
-import { FAQ, FAQCategory } from "@/frontend/types/faq";
+import {
+  getAllFAQs,
+  getFAQCategories,
+  getFAQsByCategory,
+  searchFAQs,
+  submitFAQFeedback,
+} from "@/frontend/services/faqService";
+import { FAQ, FAQCategory, FAQFeedback } from "@/frontend/types/faq";
 import { AlertCircle, Loader2 } from "lucide-react";
+import FeedbackButtons from "@/frontend/components/help-center/FeedbackButtons";
 
 interface FAQSectionProps {
   searchQuery?: string;
@@ -22,6 +29,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
   const currentLang = isRTL ? "ar" : "en";
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
   const [filteredFAQs, setFilteredFAQs] = useState<FAQ[]>([]);
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [categories, setCategories] = useState<FAQCategory[]>([]);
@@ -34,11 +42,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
       setIsLoading(true);
       setError(null);
       try {
-        // Fetch FAQs
-        const faqsData = await getAllFAQs(currentLang);
-        setFaqs(faqsData);
-
-        // Fetch unique categories
+        // Fetch unique categories first
         const categoryIds = await getFAQCategories(currentLang);
 
         // Create category objects with localized names
@@ -48,6 +52,17 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
         }));
 
         setCategories(categoryObjects);
+
+        // Fetch FAQs (all or by category if activeCategory is set)
+        let faqsData;
+        if (activeCategory) {
+          faqsData = await getFAQsByCategory(activeCategory, currentLang);
+        } else {
+          faqsData = await getAllFAQs(currentLang);
+        }
+
+        setFaqs(faqsData);
+        setFilteredFAQs(faqsData);
       } catch (err) {
         console.error("Error fetching FAQ data:", err);
         setError(
@@ -61,7 +76,7 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
     };
 
     fetchData();
-  }, [currentLang, isRTL]);
+  }, [currentLang, isRTL, activeCategory]);
 
   // Helper function to get localized category names
   const getCategoryName = (categoryId: string, isRTL: boolean): string => {
@@ -81,27 +96,59 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
       : categoryId; // Fallback to the ID if no mapping exists
   };
 
-  // Filter FAQs based on search query and active category
+  // Handle search query changes
   useEffect(() => {
-    if (faqs.length === 0) return;
+    const performSearch = async () => {
+      if (!searchQuery) {
+        // If no search query, just filter by category
+        if (activeCategory) {
+          try {
+            const categoryFAQs = await getFAQsByCategory(
+              activeCategory,
+              currentLang,
+            );
+            setFilteredFAQs(categoryFAQs);
+          } catch (err) {
+            console.error("Error fetching FAQs by category:", err);
+            setError(
+              isRTL
+                ? "حدث خطأ أثناء تحميل الأسئلة الشائعة. يرجى المحاولة مرة أخرى لاحقًا."
+                : "An error occurred while loading FAQs. Please try again later.",
+            );
+          }
+        } else {
+          // No search query and no category filter, show all FAQs
+          setFilteredFAQs(faqs);
+        }
+        return;
+      }
 
-    let filtered = faqs;
+      // If we have a search query, use the search service
+      setIsLoading(true);
+      try {
+        const searchResults = await searchFAQs(searchQuery, currentLang);
 
-    if (searchQuery) {
-      const lowerCaseQuery = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (faq) =>
-          faq.question.toLowerCase().includes(lowerCaseQuery) ||
-          faq.answer.toLowerCase().includes(lowerCaseQuery),
-      );
-    }
+        // Apply category filter if needed
+        let filtered = searchResults;
+        if (activeCategory) {
+          filtered = filtered.filter((faq) => faq.category === activeCategory);
+        }
 
-    if (activeCategory) {
-      filtered = filtered.filter((faq) => faq.category === activeCategory);
-    }
+        setFilteredFAQs(filtered);
+      } catch (err) {
+        console.error("Error searching FAQs:", err);
+        setError(
+          isRTL
+            ? "حدث خطأ أثناء البحث في الأسئلة الشائعة. يرجى المحاولة مرة أخرى لاحقًا."
+            : "An error occurred while searching FAQs. Please try again later.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    setFilteredFAQs(filtered);
-  }, [searchQuery, activeCategory, faqs]);
+    performSearch();
+  }, [searchQuery, activeCategory, currentLang, isRTL, faqs]);
 
   // Loading state
   if (isLoading) {
@@ -160,7 +207,20 @@ const FAQSection: React.FC<FAQSectionProps> = ({ searchQuery = "" }) => {
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    {faq.answer}
+                    <div className="mb-4">{faq.answer}</div>
+                    <FeedbackButtons
+                      itemId={faq.id}
+                      itemType="faq"
+                      onSubmitFeedback={async (helpful, comment) => {
+                        const feedback: FAQFeedback = {
+                          faq_id: faq.id,
+                          helpful,
+                          comment,
+                        };
+                        await submitFAQFeedback(feedback);
+                      }}
+                      className="mt-2"
+                    />
                   </AccordionContent>
                 </AccordionItem>
               ))}

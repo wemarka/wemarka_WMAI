@@ -1,16 +1,21 @@
 import { supabase } from "@/lib/supabase";
-import { AIHelpLog, AIHelpRequest, AIHelpResponse } from "@/frontend/types/ai";
+import {
+  AIHelpLog,
+  AIHelpRequest,
+  AIHelpResponse,
+  FeedbackType,
+} from "@/frontend/types/ai";
 
 /**
  * Send a question to the AI assistant and get a response
  * @param question The user's question
  * @param context Optional context to provide to the AI
- * @returns The AI's response
+ * @returns The AI's response and conversation ID
  */
 export const askAI = async (
   question: string,
   context?: string,
-): Promise<AIHelpResponse> => {
+): Promise<{ response: string; conversationId: string | null }> => {
   try {
     // Call the Supabase Edge Function
     const { data: user } = await supabase.auth.getUser();
@@ -23,12 +28,20 @@ export const askAI = async (
 
     if (error) throw new Error(error.message);
 
+    let conversationId = null;
     // Save the conversation to Supabase if user is logged in
     if (user?.user?.id && data.response) {
-      await saveConversation(user.user.id, question, data.response);
+      conversationId = await saveConversation(
+        user.user.id,
+        question,
+        data.response,
+      );
     }
 
-    return data as AIHelpResponse;
+    return {
+      response: data.response as string,
+      conversationId,
+    };
   } catch (error) {
     console.error("Error asking AI:", error);
     throw new Error("Failed to get response from AI assistant");
@@ -45,19 +58,25 @@ export const saveConversation = async (
   userId: string,
   question: string,
   response: string,
-): Promise<void> => {
+): Promise<string | null> => {
   try {
-    const { error } = await supabase.from("ai_help_logs").insert({
-      user_id: userId,
-      question,
-      response,
-    });
+    const { data, error } = await supabase
+      .from("ai_help_logs")
+      .insert({
+        user_id: userId,
+        question,
+        response,
+      })
+      .select("id")
+      .single();
 
     if (error) throw error;
+    return data?.id || null;
   } catch (error) {
     console.error("Error saving conversation:", error);
     // Don't throw here to prevent breaking the user experience
     // Just log the error
+    return null;
   }
 };
 
@@ -84,5 +103,30 @@ export const getConversationHistory = async (
   } catch (error) {
     console.error("Error getting conversation history:", error);
     return [];
+  }
+};
+
+/**
+ * Save feedback for a conversation
+ * @param conversationId The ID of the conversation
+ * @param feedback The feedback (positive or negative)
+ */
+export const saveFeedback = async (
+  conversationId: string,
+  feedback: FeedbackType,
+): Promise<void> => {
+  try {
+    if (!conversationId) return;
+
+    const { error } = await supabase
+      .from("ai_help_logs")
+      .update({ feedback })
+      .eq("id", conversationId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error saving feedback:", error);
+    // Don't throw here to prevent breaking the user experience
+    // Just log the error
   }
 };

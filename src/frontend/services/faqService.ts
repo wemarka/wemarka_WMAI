@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { FAQ, SupportAnalytics } from "@/frontend/types/faq";
+import { FAQ, SupportAnalytics, FAQFeedback } from "@/frontend/types/faq";
 
 /**
  * Fetch all FAQs from the database
@@ -7,7 +7,7 @@ import { FAQ, SupportAnalytics } from "@/frontend/types/faq";
 export const getAllFAQs = async (lang: string = "en"): Promise<FAQ[]> => {
   const { data, error } = await supabase
     .from("faqs")
-    .select("*")
+    .select("*, feedback_stats(*)")
     .eq("lang", lang)
     .order("category");
 
@@ -28,7 +28,7 @@ export const getFAQsByCategory = async (
 ): Promise<FAQ[]> => {
   const { data, error } = await supabase
     .from("faqs")
-    .select("*")
+    .select("*, feedback_stats(*)")
     .eq("category", category)
     .eq("lang", lang)
     .order("created_at");
@@ -50,7 +50,7 @@ export const searchFAQs = async (
 ): Promise<FAQ[]> => {
   const { data, error } = await supabase
     .from("faqs")
-    .select("*")
+    .select("*, feedback_stats(*)")
     .eq("lang", lang)
     .or(`question.ilike.%${query}%,answer.ilike.%${query}%`)
     .order("category");
@@ -83,6 +83,45 @@ export const getFAQCategories = async (
   // Extract unique categories
   const categories = [...new Set(data.map((item) => item.category))];
   return categories;
+};
+
+/**
+ * Submit feedback for an FAQ
+ */
+export const submitFAQFeedback = async (
+  feedback: FAQFeedback,
+): Promise<void> => {
+  const { error } = await supabase.from("faq_feedback").insert([
+    {
+      faq_id: feedback.faq_id,
+      user_id: feedback.user_id,
+      helpful: feedback.helpful,
+      comment: feedback.comment,
+    },
+  ]);
+
+  if (error) {
+    console.error("Error submitting FAQ feedback:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get feedback statistics for an FAQ
+ */
+export const getFAQFeedbackStats = async (faqId: string) => {
+  const { data, error } = await supabase
+    .from("faq_feedback_stats")
+    .select("*")
+    .eq("faq_id", faqId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching FAQ feedback stats:", error);
+    return null;
+  }
+
+  return data;
 };
 
 /**

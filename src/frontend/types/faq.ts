@@ -6,12 +6,30 @@ export interface FAQ {
   lang: string;
   created_at?: string;
   updated_at?: string;
+  feedback_stats?: FAQFeedbackStats;
 }
 
 export interface FAQCategory {
   id: string;
   name: string;
   icon?: React.ReactNode;
+}
+
+export interface FAQFeedbackStats {
+  total_votes: number;
+  helpful_votes: number;
+  unhelpful_votes: number;
+  helpful_percentage: number;
+}
+
+export interface FAQFeedback {
+  id?: string;
+  faq_id: string;
+  user_id?: string;
+  helpful: boolean;
+  comment?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SupportAnalytics {

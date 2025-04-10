@@ -36,6 +36,44 @@ export type Database = {
         }
         Relationships: []
       }
+      doc_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          doc_id: string
+          helpful: boolean
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          doc_id: string
+          helpful: boolean
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          doc_id?: string
+          helpful?: boolean
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_feedback_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "docs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       docs: {
         Row: {
           category: string
@@ -68,6 +106,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      faq_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          faq_id: string
+          helpful: boolean
+          id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          faq_id: string
+          helpful: boolean
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          faq_id?: string
+          helpful?: boolean
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faq_feedback_faq_id_fkey"
+            columns: ["faq_id"]
+            isOneToOne: false
+            referencedRelation: "faqs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       faqs: {
         Row: {
@@ -256,6 +332,39 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          stock: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       roles: {
         Row: {
           created_at: string | null
@@ -313,6 +422,66 @@ export type Database = {
         }
         Relationships: []
       }
+      test_logs: {
+        Row: {
+          created_at: string | null
+          duration: number
+          error: string | null
+          id: string
+          logs: Json | null
+          module: string
+          status: string
+          test_id: string
+          test_name: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration: number
+          error?: string | null
+          id?: string
+          logs?: Json | null
+          module: string
+          status: string
+          test_id: string
+          test_name: string
+        }
+        Update: {
+          created_at?: string | null
+          duration?: number
+          error?: string | null
+          id?: string
+          logs?: Json | null
+          module?: string
+          status?: string
+          test_id?: string
+          test_name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_sessions: {
         Row: {
           created_at: string | null
@@ -345,12 +514,71 @@ export type Database = {
         }
         Relationships: []
       }
+      doc_feedback_stats: {
+        Row: {
+          doc_id: string | null
+          helpful_percentage: number | null
+          helpful_votes: number | null
+          total_votes: number | null
+          unhelpful_votes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doc_feedback_doc_id_fkey"
+            columns: ["doc_id"]
+            isOneToOne: false
+            referencedRelation: "docs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faq_feedback_stats: {
+        Row: {
+          faq_id: string | null
+          helpful_percentage: number | null
+          helpful_votes: number | null
+          total_votes: number | null
+          unhelpful_votes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "faq_feedback_faq_id_fkey"
+            columns: ["faq_id"]
+            isOneToOne: false
+            referencedRelation: "faqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_sales: {
+        Row: {
+          category: string | null
+          date: string | null
+          image_url: string | null
+          product_id: string | null
+          product_name: string | null
+          total_sales: number | null
+          units_sold: number | null
+        }
+        Relationships: []
+      }
       sales_summary: {
         Row: {
           avg_order_value: number | null
           date: string | null
           order_count: number | null
           total_amount: number | null
+        }
+        Relationships: []
+      }
+      test_summary_view: {
+        Row: {
+          coverage: number | null
+          failed: number | null
+          last_run: string | null
+          module: string | null
+          passed: number | null
+          total_tests: number | null
         }
         Relationships: []
       }

@@ -13,7 +13,7 @@ import { Badge } from "@/frontend/components/ui/badge";
 import { Send, Sparkles, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import { useAI } from "@/frontend/contexts/AIContext";
-import { askAI } from "@/frontend/services/aiService";
+import { askAI, saveFeedback } from "@/frontend/services/aiService";
 
 interface SmartAssistantChatProps {
   initialQuery?: string;
@@ -25,6 +25,7 @@ interface ChatMessage {
   sender: "user" | "assistant";
   timestamp: Date;
   feedback?: "positive" | "negative" | null;
+  conversationId?: string | null;
 }
 
 const SmartAssistantChat: React.FC<SmartAssistantChatProps> = ({
@@ -79,14 +80,15 @@ const SmartAssistantChat: React.FC<SmartAssistantChatProps> = ({
 
     try {
       // Call the AI service
-      const response = await askAI(content, currentModule);
+      const { response, conversationId } = await askAI(content, currentModule);
 
       // Add assistant message
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: response.response,
+        content: response,
         sender: "assistant",
         timestamp: new Date(),
+        conversationId: conversationId,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -116,13 +118,24 @@ const SmartAssistantChat: React.FC<SmartAssistantChatProps> = ({
     }
   };
 
-  const handleFeedback = (
+  const handleFeedback = async (
     messageId: string,
     feedback: "positive" | "negative",
   ) => {
+    // Update local state
     setMessages((prev) =>
       prev.map((msg) => (msg.id === messageId ? { ...msg, feedback } : msg)),
     );
+
+    // Find the message and save feedback to Supabase if there's a conversationId
+    const message = messages.find((msg) => msg.id === messageId);
+    if (message?.conversationId) {
+      try {
+        await saveFeedback(message.conversationId, feedback);
+      } catch (error) {
+        console.error("Error saving feedback:", error);
+      }
+    }
   };
 
   return (

@@ -19,10 +19,18 @@ import {
   Sun,
   BookOpen,
   HelpCircle,
+  ShieldAlert,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
+import { useRole } from "@/frontend/contexts/RoleContext";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/frontend/components/ui/tooltip";
 
 interface MainSidebarProps {
   collapsed?: boolean;
@@ -46,6 +54,7 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
   const navigate = useNavigate();
   const { direction } = useLanguage();
   const { selectedModule, openSubSidebar } = useSidebar();
+  const { canAccessModule, userRoles } = useRole();
   const isRTL = direction === "rtl";
 
   const navigationItems: NavigationItem[] = [
@@ -121,6 +130,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
     },
   ];
 
+  // Filter navigation items based on user roles
+  const filteredNavigationItems = navigationItems.filter((item) =>
+    canAccessModule(item.name),
+  );
+
   return (
     <div
       className={cn(
@@ -155,52 +169,73 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col">
+        <div className="flex items-center justify-between px-4 py-2 border-b">
+          <div className="flex items-center">
+            <ShieldAlert className="h-4 w-4 text-primary mr-2" />
+            <span className="text-xs font-medium">
+              {isRTL ? "الدور:" : "Role:"}
+              <span className="font-bold ml-1">
+                {userRoles.length > 0 ? userRoles[0] : "user"}
+              </span>
+            </span>
+          </div>
+        </div>
+
         <ul className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {navigationItems.map((item) => {
+          {filteredNavigationItems.map((item) => {
             const isActive = selectedModule === item.name;
 
             return (
               <li key={item.name}>
-                <a
-                  href="#"
-                  className={cn(
-                    "flex items-center p-2.5 rounded-xl group transition-all",
-                    isActive
-                      ? "bg-primary text-white font-medium shadow-sm"
-                      : "text-foreground hover:bg-primary-50 dark:hover:bg-primary-900/20",
-                    collapsed ? "justify-center" : "justify-between",
-                  )}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (item.name === "Dashboard") {
-                      navigate(item.path);
-                    } else {
-                      openSubSidebar(item.name as any);
-                      navigate(item.path);
-                    }
-                  }}
-                >
-                  <div
-                    className={cn(
-                      "flex items-center",
-                      collapsed ? "" : "w-full",
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a
+                        href="#"
+                        className={cn(
+                          "flex items-center p-2.5 rounded-xl group transition-all",
+                          isActive
+                            ? "bg-primary text-white font-medium shadow-sm"
+                            : "text-foreground hover:bg-primary-50 dark:hover:bg-primary-900/20",
+                          collapsed ? "justify-center" : "justify-between",
+                        )}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (item.name === "Dashboard") {
+                            navigate(item.path);
+                          } else {
+                            openSubSidebar(item.name as any);
+                            navigate(item.path);
+                          }
+                        }}
+                      >
+                        <div
+                          className={cn(
+                            "flex items-center",
+                            collapsed ? "" : "w-full",
+                          )}
+                        >
+                          <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
+                            {item.icon}
+                          </div>
+                          {!collapsed && (
+                            <span className={isRTL ? "mr-3" : "ml-3"}>
+                              {item.name}
+                            </span>
+                          )}
+                        </div>
+                        {!collapsed && item.name !== "Dashboard" && (
+                          <ChevronRight
+                            className={cn("h-4 w-4", isRTL ? "rotate-180" : "")}
+                          />
+                        )}
+                      </a>
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right">{item.name}</TooltipContent>
                     )}
-                  >
-                    <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center">
-                      {item.icon}
-                    </div>
-                    {!collapsed && (
-                      <span className={isRTL ? "mr-3" : "ml-3"}>
-                        {item.name}
-                      </span>
-                    )}
-                  </div>
-                  {!collapsed && item.name !== "Dashboard" && (
-                    <ChevronRight
-                      className={cn("h-4 w-4", isRTL ? "rotate-180" : "")}
-                    />
-                  )}
-                </a>
+                  </Tooltip>
+                </TooltipProvider>
               </li>
             );
           })}

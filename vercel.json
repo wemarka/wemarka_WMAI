@@ -1,0 +1,15 @@
+{
+  "framework": "vite",
+  "buildCommand": "npm run build:${VERCEL_ENV}",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/.*", "dest": "/index.html" }
+  ],
+  "env": {
+    "VITE_APP_ENV": "${VERCEL_ENV}",
+    "VITE_DEPLOY_TIME": "${VERCEL_GIT_COMMIT_TIME}",
+    "VITE_BUILD_ID": "${VERCEL_GIT_COMMIT_SHA}"
+  }
+}

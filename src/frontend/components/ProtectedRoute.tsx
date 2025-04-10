@@ -1,20 +1,25 @@
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/frontend/contexts/AuthContext";
+import { useRole } from "@/frontend/contexts/RoleContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
   redirectTo?: string;
+  requiredModule?: string;
 }
 
 export default function ProtectedRoute({
   children,
   redirectTo = "/login",
+  requiredModule,
 }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const { canAccessModule, isLoading: roleLoading } = useRole();
   const location = useLocation();
+  const isLoading = authLoading || roleLoading;
 
-  // Show loading state while checking authentication
+  // Show loading state while checking authentication and roles
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -49,6 +54,11 @@ export default function ProtectedRoute({
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // If authenticated, render children
+  // If module access is required but user doesn't have permission
+  if (requiredModule && !canAccessModule(requiredModule)) {
+    return <Navigate to="/dashboard" state={{ from: location }} replace />;
+  }
+
+  // If authenticated and has required role, render children
   return <>{children}</>;
 }

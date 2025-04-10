@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/frontend/components/ui/card";
+import { Button } from "@/frontend/components/ui/button";
 import {
   TrendingUp,
   Users,
@@ -12,16 +13,24 @@ import {
   DollarSign,
   PercentIcon,
   Loader2,
+  RefreshCw,
+  MousePointerClick,
 } from "lucide-react";
+import { DateRange } from "react-day-picker";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import {
   getAnalyticsSummary,
-  getMockAnalyticsData,
+  getAnalyticsCategories,
 } from "@/frontend/services/analyticsService";
-import { AnalyticsSummary } from "@/frontend/types/analytics";
+import { AnalyticsSummary, AnalyticsFilters } from "@/frontend/types/analytics";
 import WeeklySalesChart from "./WeeklySalesChart";
 import TicketDistributionChart from "./TicketDistributionChart";
+import TopProductsChart from "./TopProductsChart";
+import TopAgentsChart from "./TopAgentsChart";
+import BounceRateChart from "./BounceRateChart";
+import DateRangeFilter from "./DateRangeFilter";
+import CategoryFilter from "./CategoryFilter";
 import StatCard from "./StatCard";
 
 interface AnalyticsDashboardProps {
@@ -37,17 +46,53 @@ const AnalyticsDashboard = ({ isRTL = false }: AnalyticsDashboardProps) => {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
 
+  // Filter states
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: new Date(new Date().setDate(new Date().getDate() - 30)),
+    to: new Date(),
+  });
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
+    undefined,
+  );
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Fetch categories for filter
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getAnalyticsCategories();
+        setCategories(categoriesData);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Fetch analytics data with filters
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      setIsLoading(!analyticsData); // Only show full loading screen on initial load
+      setIsRefreshing(!!analyticsData); // Show refresh indicator for subsequent loads
       setError(null);
-      try {
-        // In a production environment, we would use the real data
-        // const data = await getAnalyticsSummary();
 
-        // For development/demo, use mock data
-        const data = getMockAnalyticsData();
+      try {
+        // Prepare filters
+        const filters: AnalyticsFilters = {
+          dateRange: {
+            from:
+              dateRange?.from ||
+              new Date(new Date().setDate(new Date().getDate() - 30)),
+            to: dateRange?.to || new Date(),
+          },
+          category: selectedCategory,
+        };
+
+        // Fetch real data from Supabase
+        const data = await getAnalyticsSummary(filters);
         setAnalyticsData(data);
       } catch (err) {
         console.error("Error fetching analytics data:", err);
@@ -58,11 +103,21 @@ const AnalyticsDashboard = ({ isRTL = false }: AnalyticsDashboardProps) => {
         );
       } finally {
         setIsLoading(false);
+        setIsRefreshing(false);
       }
     };
 
     fetchData();
-  }, [rtl]);
+  }, [rtl, dateRange, selectedCategory]);
+
+  // Reset filters
+  const handleResetFilters = () => {
+    setDateRange({
+      from: new Date(new Date().setDate(new Date().getDate() - 30)),
+      to: new Date(),
+    });
+    setSelectedCategory(undefined);
+  };
 
   // Format currency
   const formatCurrency = (value: number) => {
@@ -104,6 +159,9 @@ const AnalyticsDashboard = ({ isRTL = false }: AnalyticsDashboardProps) => {
               <div className="text-center">
                 <TrendingUp className="h-12 w-12 text-destructive mx-auto mb-4" />
                 <h3 className="text-lg font-medium mb-2">{error}</h3>
+                <Button onClick={handleResetFilters} className="mt-4">
+                  {rtl ? "إعادة تعيين الفلاتر" : "Reset Filters"}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -116,17 +174,49 @@ const AnalyticsDashboard = ({ isRTL = false }: AnalyticsDashboardProps) => {
     <ModuleLayout moduleName={rtl ? "التحليلات" : "Analytics"}>
       <div className="h-full bg-background">
         <div className="overflow-auto p-6">
-          <h1 className="text-2xl font-bold mb-4">
-            {rtl ? "لوحة التحليلات" : "Analytics Dashboard"}
-          </h1>
-          <p className="text-muted-foreground mb-6">
-            {rtl
-              ? "نظرة عامة على أداء الأعمال والمبيعات والمستخدمين"
-              : "Overview of business performance, sales, and user metrics"}
-          </p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-bold">
+                {rtl ? "لوحة التحليلات" : "Analytics Dashboard"}
+              </h1>
+              <p className="text-muted-foreground mt-1">
+                {rtl
+                  ? "نظرة عامة على أداء الأعمال والمبيعات والمستخدمين"
+                  : "Overview of business performance, sales, and user metrics"}
+              </p>
+            </div>
+
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4 mt-4 md:mt-0">
+              <DateRangeFilter
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+              />
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+              />
+              <Button
+                variant="outline"
+                onClick={handleResetFilters}
+                className="whitespace-nowrap"
+              >
+                {rtl ? "إعادة تعيين" : "Reset Filters"}
+              </Button>
+              {isRefreshing && (
+                <div className="flex items-center">
+                  <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                  <span className="text-sm text-muted-foreground">
+                    {rtl ? "جاري التحديث..." : "Refreshing..."}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Key Metrics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             <StatCard
               title={rtl ? "الإيرادات الشهرية" : "Monthly Revenue"}
               value={formatCurrency(analyticsData?.monthlyRevenue || 0)}
@@ -160,12 +250,35 @@ const AnalyticsDashboard = ({ isRTL = false }: AnalyticsDashboardProps) => {
               icon={<Clock className="h-5 w-5 text-primary" />}
               trend={{ value: 1.8, isPositive: false }}
             />
+
+            <StatCard
+              title={rtl ? "معدل الارتداد" : "Bounce Rate"}
+              value={`${(analyticsData?.bounceRate || 0).toFixed(2)}%`}
+              description={
+                rtl
+                  ? "نسبة الزوار الذين غادروا بعد صفحة واحدة"
+                  : "Visitors who left after viewing one page"
+              }
+              icon={<MousePointerClick className="h-5 w-5 text-primary" />}
+              trend={{ value: 2.3, isPositive: false }}
+            />
           </div>
 
-          {/* Charts */}
+          {/* Main Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <WeeklySalesChart data={analyticsData?.salesData || []} />
             <TicketDistributionChart data={analyticsData?.ticketData || []} />
+          </div>
+
+          {/* Top Products and Agents */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <TopProductsChart data={analyticsData?.topProducts || []} />
+            <TopAgentsChart data={analyticsData?.topAgents || []} />
+          </div>
+
+          {/* Bounce Rate Chart */}
+          <div className="mb-6">
+            <BounceRateChart data={analyticsData?.bounceRateData || []} />
           </div>
 
           {/* Additional Metrics */}

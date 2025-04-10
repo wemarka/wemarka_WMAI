@@ -8,7 +8,7 @@ import {
 } from "@/frontend/components/ui/card";
 import { Button } from "@/frontend/components/ui/button";
 import { Link } from "react-router-dom";
-import { FileText, Code, List, TestTube, Globe } from "lucide-react";
+import { FileText, Code, List, TestTube, Globe, Activity } from "lucide-react";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 
@@ -23,6 +23,32 @@ const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
   return (
     <ModuleLayout moduleName={effectiveRTL ? "المطور" : "Developer"}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Activity className="h-5 w-5 mr-2 rtl:ml-2 rtl:mr-0" />
+              {isRTL ? "مراقبة النظام" : "System Monitoring"}
+            </CardTitle>
+            <CardDescription>
+              {isRTL
+                ? "مراقبة أداء النظام والسجلات والاستخدام"
+                : "Monitor system performance, logs, and usage"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              {isRTL
+                ? "تتبع وقت التشغيل وسجلات الأخطاء والاستعلامات البطيئة ومقاييس الاستخدام"
+                : "Track uptime, error logs, slow queries, and usage metrics"}
+            </p>
+            <Button asChild className="w-full">
+              <Link to="/dashboard/developer/monitoring">
+                {isRTL ? "فتح لوحة المراقبة" : "Open Monitoring Dashboard"}
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">

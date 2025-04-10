@@ -7,6 +7,8 @@ import {
 } from "react";
 import { authService } from "@/backend/services/authService";
 import { Session, User, Provider } from "@supabase/supabase-js";
+import { getUserRoles, assignUserRole } from "@/frontend/services/roleService";
+import { UserRole } from "@/frontend/contexts/RoleContext";
 
 type AuthContextType = {
   session: Session | null;
@@ -25,6 +27,7 @@ type AuthContextType = {
   updateUserProfile: (userData: object) => Promise<{ error: Error | null }>;
   signInWithProvider: (provider: Provider) => Promise<{ error: Error | null }>;
   useDevelopmentUser: () => void;
+  assignRole: (userId: string, role: UserRole) => Promise<boolean>;
 };
 
 // Default development user
@@ -117,6 +120,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string, userData?: object) => {
     try {
       const { error } = await authService.signUp(email, password, userData);
+
+      // If signup is successful, assign default user role
+      if (!error && userData) {
+        const { data } = await authService.getUser();
+        if (data.user) {
+          await assignUserRole(data.user.id, "user");
+        }
+      }
+
       return { error };
     } catch (error) {
       return { error: error as Error };
@@ -127,6 +139,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authService.signOut();
     // Clear any local storage items related to auth
     localStorage.removeItem("wasLoggedIn");
+    localStorage.removeItem("usingDevUser");
     // Reset development user state
     setIsDevelopmentUser(false);
     setUser(null);
@@ -174,6 +187,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const assignRole = async (userId: string, role: UserRole) => {
+    return await assignUserRole(userId, role);
+  };
+
   const value = {
     session,
     user,
@@ -187,6 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     updateUserProfile,
     signInWithProvider,
     useDevelopmentUser,
+    assignRole,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

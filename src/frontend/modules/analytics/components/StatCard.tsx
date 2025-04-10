@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@/frontend/components/ui/card";
 import { cn } from "@/frontend/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, AlertCircle } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -13,6 +13,8 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  isLoading?: boolean;
+  error?: string;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -22,22 +24,33 @@ const StatCard: React.FC<StatCardProps> = ({
   icon,
   trend,
   className,
+  isLoading = false,
+  error,
 }) => {
   return (
     <Card className={cn("overflow-hidden", className)}>
       <CardContent className="p-6">
         <div className="flex justify-between items-start">
-          <div>
+          <div className="flex-1">
             <p className="text-sm font-medium text-muted-foreground mb-1">
               {title}
             </p>
-            <h3 className="text-2xl font-bold">{value}</h3>
-            {description && (
+            {isLoading ? (
+              <div className="h-8 w-24 bg-muted animate-pulse rounded-md" />
+            ) : error ? (
+              <div className="flex items-center text-destructive">
+                <AlertCircle className="h-4 w-4 mr-1" />
+                <span className="text-sm">Error loading data</span>
+              </div>
+            ) : (
+              <h3 className="text-2xl font-bold">{value}</h3>
+            )}
+            {description && !isLoading && !error && (
               <p className="text-xs text-muted-foreground mt-1">
                 {description}
               </p>
             )}
-            {trend && (
+            {trend && !isLoading && !error && (
               <div className="flex items-center mt-2">
                 <span
                   className={cn(

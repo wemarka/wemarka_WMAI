@@ -24,11 +24,29 @@ interface WeeklySalesChartProps {
 }
 
 const WeeklySalesChart: React.FC<WeeklySalesChartProps> = ({
-  data,
+  data = [],
   className,
 }) => {
   const { direction } = useLanguage();
   const isRTL = direction === "rtl";
+
+  // Check if data is empty
+  if (!data || data.length === 0) {
+    return (
+      <Card className={className}>
+        <CardHeader>
+          <CardTitle>{isRTL ? "المبيعات الأسبوعية" : "Weekly Sales"}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] flex items-center justify-center">
+            <p className="text-muted-foreground">
+              {isRTL ? "لا توجد بيانات متاحة" : "No data available"}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Format dates for display
   const formattedData = data.map((item) => ({
@@ -37,6 +55,10 @@ const WeeklySalesChart: React.FC<WeeklySalesChartProps> = ({
       month: "short",
       day: "numeric",
     }),
+    // Ensure values are numbers
+    total_amount: Number(item.total_amount) || 0,
+    avg_order_value: Number(item.avg_order_value) || 0,
+    order_count: Number(item.order_count) || 0,
   }));
 
   return (
@@ -55,10 +77,7 @@ const WeeklySalesChart: React.FC<WeeklySalesChartProps> = ({
               <XAxis dataKey="date" reversed={isRTL} />
               <YAxis />
               <Tooltip
-                formatter={(value) => [
-                  `$${value}`,
-                  isRTL ? "المبلغ" : "Amount",
-                ]}
+                formatter={(value) => [`${value}`, isRTL ? "المبلغ" : "Amount"]}
               />
               <Legend />
               <Line
