@@ -25,6 +25,7 @@ import {
   DocumentationCenterDashboard,
   DocumentationCenterTestPanel,
 } from "@/frontend/modules/documentation-center";
+import { HelpCenterDashboard } from "@/frontend/modules/help-center";
 
 // Import test panel components
 import StoreTestPanel from "@/frontend/modules/store/components/StoreTestPanel";
@@ -242,6 +243,16 @@ function App() {
                       <ProtectedRoute>
                         <DashboardLayout currentModule="Documentation">
                           <DocumentationCenterDashboard />
+                        </DashboardLayout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/help-center/*"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardLayout currentModule="Help Center">
+                          <HelpCenterDashboard />
                         </DashboardLayout>
                       </ProtectedRoute>
                     }

@@ -18,6 +18,7 @@ import {
   Moon,
   Sun,
   BookOpen,
+  HelpCircle,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
@@ -97,6 +98,11 @@ const MainSidebar: React.FC<MainSidebarProps> = ({
       name: "Documentation",
       icon: <BookOpen className="h-5 w-5" />,
       path: "/dashboard/documentation",
+    },
+    {
+      name: "Help Center",
+      icon: <HelpCircle className="h-5 w-5" />,
+      path: "/dashboard/help-center",
     },
     {
       name: "Integrations",

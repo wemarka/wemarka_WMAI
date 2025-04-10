@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import {
   Card,
@@ -47,7 +47,9 @@ import {
 } from "lucide-react";
 
 interface SupportTicketProps {
-  // Props can be added as needed
+  onBackToDashboard?: () => void;
+  initialTicketId?: number;
+  createNewTicket?: boolean;
 }
 
 interface Ticket {
@@ -75,13 +77,18 @@ interface TicketMessage {
   agentName?: string;
 }
 
-const SupportTicket: React.FC<SupportTicketProps> = () => {
+const SupportTicket: React.FC<SupportTicketProps> = ({
+  onBackToDashboard,
+  initialTicketId,
+  createNewTicket = false,
+}) => {
   const { direction } = useLanguage();
   const isRTL = direction === "rtl";
   const [activeTab, setActiveTab] = useState("all");
   const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
-  const [isCreateTicketOpen, setIsCreateTicketOpen] = useState(false);
+  const [isCreateTicketOpen, setIsCreateTicketOpen] = useState(createNewTicket);
   const [searchTerm, setSearchTerm] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
 
   // Mock data for tickets
   const tickets: Ticket[] = [
@@ -186,7 +193,7 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
     },
   ];
 
-  // Filter tickets based on search term and active tab
+  // Filter tickets based on search term, active tab, and priority
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
       searchTerm === "" ||
@@ -197,7 +204,10 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
 
     const matchesTab = activeTab === "all" || ticket.status === activeTab;
 
-    return matchesSearch && matchesTab;
+    const matchesPriority =
+      priorityFilter === null || ticket.priority === priorityFilter;
+
+    return matchesSearch && matchesTab && matchesPriority;
   });
 
   const getStatusBadge = (status: string) => {
@@ -291,8 +301,30 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
     }
   };
 
+  // Set initial ticket if provided
+  React.useEffect(() => {
+    if (initialTicketId) {
+      setSelectedTicket(initialTicketId);
+    }
+  }, [initialTicketId]);
+
   return (
     <div className="flex-1 bg-background">
+      {onBackToDashboard && (
+        <div className="flex justify-between items-center mb-4">
+          <Button
+            variant="outline"
+            onClick={onBackToDashboard}
+            className="mb-2"
+          >
+            {isRTL ? "العودة إلى لوحة القيادة" : "Back to Dashboard"}
+          </Button>
+          <Button onClick={() => setIsCreateTicketOpen(true)} className="mb-2">
+            <Plus className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+            {isRTL ? "تذكرة جديدة" : "New Ticket"}
+          </Button>
+        </div>
+      )}
       <div className="flex h-[calc(100vh-10rem)] overflow-hidden">
         {/* Tickets List */}
         <div
@@ -348,13 +380,40 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                   : `${filteredTickets.length} tickets`}
               </span>
               <div className="flex gap-2">
-                <Button variant="ghost" size="sm">
-                  <Filter className="h-4 w-4 mr-1" />
-                  {isRTL ? "تصفية" : "Filter"}
-                </Button>
+                <Select
+                  value={priorityFilter || "all"}
+                  onValueChange={(value) =>
+                    setPriorityFilter(value === "all" ? null : value)
+                  }
+                >
+                  <SelectTrigger className="w-[130px] h-9">
+                    <Filter className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                    <SelectValue placeholder={isRTL ? "تصفية" : "Filter"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">
+                      {isRTL ? "جميع الأولويات" : "All Priorities"}
+                    </SelectItem>
+                    <SelectItem value="high">
+                      {isRTL ? "عالية" : "High"}
+                    </SelectItem>
+                    <SelectItem value="medium">
+                      {isRTL ? "متوسطة" : "Medium"}
+                    </SelectItem>
+                    <SelectItem value="low">
+                      {isRTL ? "منخفضة" : "Low"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
                 <Dialog
                   open={isCreateTicketOpen}
-                  onOpenChange={setIsCreateTicketOpen}
+                  onOpenChange={(open) => {
+                    setIsCreateTicketOpen(open);
+                    // If dialog is closed and we're in create mode, go back to dashboard
+                    if (!open && createNewTicket && onBackToDashboard) {
+                      onBackToDashboard();
+                    }
+                  }}
                 >
                   <DialogTrigger asChild>
                     <Button size="sm">
@@ -415,7 +474,7 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                           >
                             {isRTL ? "الأولوية" : "Priority"}
                           </label>
-                          <Select>
+                          <Select defaultValue="medium">
                             <SelectTrigger>
                               <SelectValue
                                 placeholder={
@@ -443,7 +502,7 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                           >
                             {isRTL ? "تعيين إلى" : "Assign To"}
                           </label>
-                          <Select>
+                          <Select defaultValue="sarah">
                             <SelectTrigger>
                               <SelectValue
                                 placeholder={
@@ -471,7 +530,18 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                       >
                         {isRTL ? "إلغاء" : "Cancel"}
                       </Button>
-                      <Button onClick={() => setIsCreateTicketOpen(false)}>
+                      <Button
+                        onClick={() => {
+                          // In a real app, we would save the ticket here
+                          setIsCreateTicketOpen(false);
+                          // Simulate creating a new ticket
+                          alert(
+                            isRTL
+                              ? "تم إنشاء التذكرة بنجاح"
+                              : "Ticket created successfully",
+                          );
+                        }}
+                      >
                         {isRTL ? "إنشاء" : "Create"}
                       </Button>
                     </DialogFooter>
@@ -616,9 +686,84 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  {isRTL ? "تحديث الحالة" : "Update Status"}
-                </Button>
+                <Select
+                  defaultValue={
+                    tickets.find((t) => t.id === selectedTicket)?.status ||
+                    "open"
+                  }
+                  onValueChange={(value) => {
+                    // Update ticket status
+                    const updatedTickets = tickets.map((ticket) =>
+                      ticket.id === selectedTicket
+                        ? {
+                            ...ticket,
+                            status: value as
+                              | "open"
+                              | "in_progress"
+                              | "resolved"
+                              | "closed",
+                          }
+                        : ticket,
+                    );
+                    // In a real app, we would save this to the database
+                    alert(
+                      isRTL
+                        ? `تم تحديث حالة التذكرة إلى ${value}`
+                        : `Ticket status updated to ${value}`,
+                    );
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue
+                      placeholder={isRTL ? "تحديث الحالة" : "Update Status"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="open">
+                      {isRTL ? "مفتوح" : "Open"}
+                    </SelectItem>
+                    <SelectItem value="in_progress">
+                      {isRTL ? "قيد التنفيذ" : "In Progress"}
+                    </SelectItem>
+                    <SelectItem value="resolved">
+                      {isRTL ? "تم الحل" : "Resolved"}
+                    </SelectItem>
+                    <SelectItem value="closed">
+                      {isRTL ? "مغلق" : "Closed"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  defaultValue={
+                    tickets.find((t) => t.id === selectedTicket)?.assignedTo ||
+                    "unassigned"
+                  }
+                  onValueChange={(value) => {
+                    // Update assigned agent
+                    // In a real app, we would save this to the database
+                    alert(
+                      isRTL
+                        ? `تم تعيين التذكرة إلى ${value}`
+                        : `Ticket assigned to ${value}`,
+                    );
+                  }}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue
+                      placeholder={isRTL ? "تعيين إلى" : "Assign To"}
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">
+                      {isRTL ? "غير معين" : "Unassigned"}
+                    </SelectItem>
+                    <SelectItem value="Sarah Johnson">Sarah Johnson</SelectItem>
+                    <SelectItem value="Mohammed Ali">Mohammed Ali</SelectItem>
+                    <SelectItem value="John Doe">John Doe</SelectItem>
+                  </SelectContent>
+                </Select>
+
                 <Button variant="ghost" size="icon">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
@@ -689,7 +834,16 @@ const SupportTicket: React.FC<SupportTicketProps> = () => {
                 <Button variant="outline">
                   {isRTL ? "إرفاق ملف" : "Attach File"}
                 </Button>
-                <Button>{isRTL ? "إرسال" : "Send"}</Button>
+                <Button
+                  onClick={() => {
+                    // In a real app, we would save the message to the database
+                    alert(
+                      isRTL ? "تم إرسال الرد بنجاح" : "Reply sent successfully",
+                    );
+                  }}
+                >
+                  {isRTL ? "إرسال" : "Send"}
+                </Button>
               </div>
             </div>
           </div>

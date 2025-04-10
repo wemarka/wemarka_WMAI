@@ -32,6 +32,7 @@ import {
 } from "@/frontend/contexts/SidebarContext";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import { Button } from "@/frontend/components/ui/button";
+import { ContextualHelpButton } from "@/frontend/modules/help-center";
 import {
   Avatar,
   AvatarFallback,
@@ -327,20 +328,11 @@ const DashboardLayoutContent = ({
                 </Tooltip>
               </TooltipProvider>
 
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-gray-500 hover:text-primary hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-full"
-                    >
-                      <HelpCircle className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>{rtl ? "المساعدة" : "Help"}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <ContextualHelpButton
+                currentModule={currentModule}
+                variant="minimal"
+                size="md"
+              />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
