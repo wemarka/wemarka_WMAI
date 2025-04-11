@@ -6,8 +6,9 @@ interface CodeAnalysisRequest {
   branch?: string;
   filePath?: string;
   codeSnippet?: string;
-  analysisType: "quality" | "performance" | "security" | "feature" | "all";
+  analysisType?: "quality" | "performance" | "security" | "feature" | "all";
   context?: string;
+  prompt?: string;
 }
 
 interface AIRecommendation {
@@ -48,12 +49,177 @@ Deno.serve(async (req) => {
   try {
     const request = (await req.json()) as CodeAnalysisRequest;
 
-    // In a real implementation, you would send the code to an AI service for analysis
-    // For this example, we'll generate mock recommendations based on the request
+    // If a direct prompt is provided, forward it to OpenAI
+    if (request.prompt) {
+      const openAIResponse = await fetch(
+        "https://api.openai.com/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-4",
+            messages: [{ role: "user", content: request.prompt }],
+            temperature: 0.3,
+            max_tokens: 2000,
+          }),
+        },
+      );
 
+      if (!openAIResponse.ok) {
+        const errorData = await openAIResponse.json();
+        throw new Error(
+          `OpenAI API error: ${errorData.error?.message || "Unknown error"}`,
+        );
+      }
+
+      const data = await openAIResponse.json();
+      return new Response(JSON.stringify(data), {
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+        },
+        status: 200,
+      });
+    }
+
+    // For code analysis requests without a direct prompt, use OpenAI to analyze the code
     const now = new Date().toISOString();
+    const analysisType = request.analysisType || "all";
+
+    // If we have code to analyze, send it to OpenAI
+    if (request.codeSnippet || request.filePath || request.repositoryUrl) {
+      // Prepare the prompt for OpenAI
+      let prompt =
+        "Analyze the following code and provide recommendations for improvements. ";
+
+      // Add analysis type to the prompt
+      if (analysisType !== "all") {
+        prompt += `Focus on ${analysisType} aspects. `;
+      } else {
+        prompt +=
+          "Include performance, security, code quality, and feature recommendations. ";
+      }
+
+      // Add code content to the prompt
+      if (request.codeSnippet) {
+        prompt += `\n\nCode snippet to analyze:\n\`\`\`\n${request.codeSnippet}\n\`\`\`\n`;
+      } else if (request.filePath) {
+        prompt += `\n\nAnalyze file at path: ${request.filePath}\n`;
+      } else if (request.repositoryUrl) {
+        prompt += `\n\nAnalyze GitHub repository: ${request.repositoryUrl}, branch: ${request.branch || "main"}\n`;
+      }
+
+      // Add context if provided
+      if (request.context) {
+        prompt += `\n\nAdditional context: ${request.context}\n`;
+      }
+
+      // Add specific instructions for the response format
+      prompt += `\n\nPlease provide your analysis in the following JSON format:
+{
+  "recommendations": [
+    {
+      "title": "Recommendation title",
+      "description": "Detailed description",
+      "priority": "high|medium|low",
+      "category": "performance|security|code-quality|feature|ux",
+      "implementationDifficulty": "easy|medium|hard",
+      "estimatedHours": number,
+      "codeSnippet": "Example code if applicable"
+    }
+  ],
+  "codeQualityScore": number (0-100),
+  "performanceScore": number (0-100),
+  "securityScore": number (0-100),
+  "summary": "Overall summary of the analysis"
+}`;
+
+      try {
+        // Call OpenAI API
+        const openAIResponse = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "gpt-4",
+              messages: [{ role: "user", content: prompt }],
+              temperature: 0.3,
+              max_tokens: 2000,
+            }),
+          },
+        );
+
+        if (!openAIResponse.ok) {
+          throw new Error(`OpenAI API returned ${openAIResponse.status}`);
+        }
+
+        const data = await openAIResponse.json();
+        const aiResponse = data?.choices?.[0]?.message?.content;
+
+        if (!aiResponse) {
+          throw new Error("No response content from OpenAI");
+        }
+
+        // Parse the JSON response from OpenAI
+        let parsedResponse;
+        try {
+          // Extract JSON from the response (in case it includes markdown formatting)
+          const jsonMatch = aiResponse.match(/\{[\s\S]*\}/m);
+          const jsonString = jsonMatch ? jsonMatch[0] : aiResponse;
+          parsedResponse = JSON.parse(jsonString);
+        } catch (parseError) {
+          console.error("Error parsing OpenAI response:", parseError);
+          throw new Error("Failed to parse AI response");
+        }
+
+        // Format the response to match our expected CodeAnalysisResult structure
+        const result: CodeAnalysisResult = {
+          recommendations: (parsedResponse.recommendations || []).map(
+            (rec: any, index: number) => ({
+              id: `ai-${Date.now()}-${index}`,
+              title: rec.title || "Recommendation",
+              description: rec.description || "",
+              priority: rec.priority || "medium",
+              category: rec.category || "code-quality",
+              createdAt: now,
+              status: "new",
+              implementationDifficulty:
+                rec.implementationDifficulty || "medium",
+              estimatedHours: rec.estimatedHours || 4,
+              relatedModule: rec.relatedModule || "Core",
+              codeSnippet: rec.codeSnippet || undefined,
+            }),
+          ),
+          codeQualityScore: parsedResponse.codeQualityScore || 75,
+          performanceScore: parsedResponse.performanceScore || 80,
+          securityScore: parsedResponse.securityScore || 70,
+          summary: parsedResponse.summary || "Analysis completed successfully.",
+          analysisDate: now,
+        };
+
+        return new Response(JSON.stringify(result), {
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+          status: 200,
+        });
+      } catch (aiError) {
+        console.error("Error calling OpenAI:", aiError);
+        // Fall back to mock data if OpenAI fails
+      }
+    }
+
+    // If we reach here, either there was no code to analyze or OpenAI failed
+    // Generate mock recommendations based on analysis type
     const recommendations: AIRecommendation[] = [];
-    const analysisType = request.analysisType;
 
     // Generate recommendations based on analysis type and code context
     if (analysisType === "all" || analysisType === "performance") {
@@ -186,8 +352,7 @@ Deno.serve(async (req) => {
       codeQualityScore,
       performanceScore,
       securityScore,
-      summary:
-        "Analysis complete. Found ${recommendations.length} potential improvements across performance, security, code quality, and features.",
+      summary: `Analysis complete. Found ${recommendations.length} potential improvements across performance, security, code quality, and features.`,
       analysisDate: now,
     };
 

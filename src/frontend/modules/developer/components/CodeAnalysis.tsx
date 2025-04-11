@@ -74,6 +74,7 @@ import {
   Sparkles,
   ThumbsDown,
   ThumbsUp,
+  Trash2,
   X,
   Zap,
 } from "lucide-react";
@@ -85,6 +86,7 @@ import {
   analyzeFile,
   analyzeGitHubRepository,
   trackRecommendationImplementation,
+  clearAnalysisCache,
   CodeAnalysisRequest,
   CodeAnalysisResult,
 } from "@/frontend/services/codeAnalysisService";
@@ -160,6 +162,7 @@ export const CodeAnalysis: React.FC<CodeAnalysisProps> = ({
     useState<CodeAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [isCacheClearing, setIsCacheClearing] = useState(false);
 
   // Derived states from user preferences
   const activeTab = userPreferences.activeTab;
@@ -277,6 +280,21 @@ export const CodeAnalysis: React.FC<CodeAnalysisProps> = ({
       );
     } finally {
       setIsAnalyzing(false);
+    }
+  };
+
+  // Handle clearing the analysis cache
+  const handleClearCache = async () => {
+    setIsCacheClearing(true);
+    try {
+      clearAnalysisCache();
+      // Show success message or update UI as needed
+      setTimeout(() => {
+        setIsCacheClearing(false);
+      }, 500);
+    } catch (error) {
+      console.error("Error clearing cache:", error);
+      setIsCacheClearing(false);
     }
   };
 
@@ -490,6 +508,27 @@ export const CodeAnalysis: React.FC<CodeAnalysisProps> = ({
               {effectiveRTL ? "جاري الحفظ..." : "Saving..."}
             </div>
           )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleClearCache}
+                  disabled={isCacheClearing}
+                >
+                  {isCacheClearing ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {effectiveRTL ? "مسح ذاكرة التخزين المؤقت" : "Clear Cache"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
