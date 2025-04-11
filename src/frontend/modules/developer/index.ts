@@ -6,6 +6,14 @@ export { default as QAChecklistPanel } from "./components/QAChecklistPanel";
 export { default as MonitoringDashboard } from "./components/MonitoringDashboard";
 export { ProjectAnalysis } from "./components/ProjectAnalysis";
 export { default as CodeAnalysis } from "./components/CodeAnalysis";
+export { default as ProjectAnalysisDashboard } from "./components/ProjectAnalysisDashboard";
+export { default as ProjectRoadmap } from "./components/ProjectRoadmap";
+export { default as DevelopmentRoadmapPanel } from "./components/DevelopmentRoadmapPanel";
+export { default as AIRoadmapRecommendations } from "./components/AIRoadmapRecommendations";
+export { default as ProjectAnalysisInsights } from "./components/ProjectAnalysisInsights";
+export { default as RoadmapHistory } from "./components/RoadmapHistory";
+export { default as RoadmapComparison } from "./components/RoadmapComparison";
+export { default as RoadmapComparisonEnhanced } from "./components/RoadmapComparisonEnhanced";
 
 // Re-export ProjectAnalysis as default for backward compatibility
 import { ProjectAnalysis as DefaultProjectAnalysis } from "./components/ProjectAnalysis";

@@ -8,7 +8,15 @@ import {
 } from "@/frontend/components/ui/card";
 import { Button } from "@/frontend/components/ui/button";
 import { Link } from "react-router-dom";
-import { FileText, Code, List, TestTube, Globe, Activity } from "lucide-react";
+import {
+  FileText,
+  Code,
+  List,
+  TestTube,
+  Globe,
+  Activity,
+  BarChart,
+} from "lucide-react";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 
@@ -144,6 +152,46 @@ const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
             <p className="text-muted-foreground">
               {isRTL ? "عرض سجلات التطوير" : "View development logs"}
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <BarChart className="h-5 w-5 mr-2 rtl:ml-2 rtl:mr-0" />
+              {isRTL ? "تحليل المشروع" : "Project Analysis"}
+            </CardTitle>
+            <CardDescription>
+              {isRTL
+                ? "تحليل شامل لحالة المشروع والتقدم"
+                : "Comprehensive analysis of project status and progress"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              {isRTL
+                ? "عرض تقدم الوحدات وخارطة الطريق وتوصيات التحسين"
+                : "View module progress, roadmap, and improvement recommendations"}
+            </p>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              <Button asChild variant="outline">
+                <Link to="/dashboard/developer/project-analysis">
+                  {isRTL ? "تحليل المشروع" : "Project Analysis"}
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/dashboard/developer/development-roadmap">
+                  {isRTL ? "خارطة التطوير" : "Development Roadmap"}
+                </Link>
+              </Button>
+            </div>
+            <Button asChild className="w-full">
+              <Link to="/dashboard/developer/project-analysis-dashboard">
+                {isRTL
+                  ? "فتح لوحة تحليل المشروع الشاملة"
+                  : "Open Comprehensive Dashboard"}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -95,6 +95,51 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_recommendations: {
+        Row: {
+          category: string
+          code_snippet: string | null
+          created_at: string | null
+          description: string
+          estimated_hours: number | null
+          feedback: string | null
+          id: string
+          implementation_difficulty: string | null
+          priority: string
+          related_module: string | null
+          status: string
+          title: string
+        }
+        Insert: {
+          category: string
+          code_snippet?: string | null
+          created_at?: string | null
+          description: string
+          estimated_hours?: number | null
+          feedback?: string | null
+          id?: string
+          implementation_difficulty?: string | null
+          priority: string
+          related_module?: string | null
+          status: string
+          title: string
+        }
+        Update: {
+          category?: string
+          code_snippet?: string | null
+          created_at?: string | null
+          description?: string
+          estimated_hours?: number | null
+          feedback?: string | null
+          id?: string
+          implementation_difficulty?: string | null
+          priority?: string
+          related_module?: string | null
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       cart_items: {
         Row: {
           cart_id: string
@@ -426,6 +471,48 @@ export type Database = {
           },
         ]
       }
+      git_commits: {
+        Row: {
+          additions: number | null
+          author: string | null
+          branch: string | null
+          commit_hash: string
+          created_at: string | null
+          date: string
+          deletions: number | null
+          files_changed: number | null
+          id: string
+          message: string | null
+          repository: string | null
+        }
+        Insert: {
+          additions?: number | null
+          author?: string | null
+          branch?: string | null
+          commit_hash: string
+          created_at?: string | null
+          date: string
+          deletions?: number | null
+          files_changed?: number | null
+          id?: string
+          message?: string | null
+          repository?: string | null
+        }
+        Update: {
+          additions?: number | null
+          author?: string | null
+          branch?: string | null
+          commit_hash?: string
+          created_at?: string | null
+          date?: string
+          deletions?: number | null
+          files_changed?: number | null
+          id?: string
+          message?: string | null
+          repository?: string | null
+        }
+        Relationships: []
+      }
       homepage_draft_layouts: {
         Row: {
           created_at: string | null
@@ -557,6 +644,39 @@ export type Database = {
         }
         Relationships: []
       }
+      milestones: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          due_date: string
+          id: string
+          name: string
+          progress: number
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          due_date: string
+          id?: string
+          name: string
+          progress: number
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          due_date?: string
+          id?: string
+          name?: string
+          progress?: number
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       module_access: {
         Row: {
           access_time: string
@@ -594,6 +714,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      module_progress: {
+        Row: {
+          completed_tasks: number
+          contributors: string[] | null
+          created_at: string | null
+          id: string
+          last_activity: string | null
+          module: string
+          progress: number
+          total_tasks: number
+          updated_at: string | null
+        }
+        Insert: {
+          completed_tasks?: number
+          contributors?: string[] | null
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          module: string
+          progress: number
+          total_tasks?: number
+          updated_at?: string | null
+        }
+        Update: {
+          completed_tasks?: number
+          contributors?: string[] | null
+          created_at?: string | null
+          id?: string
+          last_activity?: string | null
+          module?: string
+          progress?: number
+          total_tasks?: number
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       order_items: {
         Row: {
@@ -772,6 +928,135 @@ export type Database = {
         }
         Relationships: []
       }
+      project_metrics: {
+        Row: {
+          average_issue_resolution_time: number | null
+          burndown: Json | null
+          closed_issues: number
+          code_quality: Json | null
+          contributors: number
+          created_at: string | null
+          id: string
+          merged_pull_requests: number
+          open_issues: number
+          pull_requests: number
+          total_commits: number
+          total_files: number
+          total_lines: number
+          updated_at: string | null
+          velocity: number | null
+        }
+        Insert: {
+          average_issue_resolution_time?: number | null
+          burndown?: Json | null
+          closed_issues?: number
+          code_quality?: Json | null
+          contributors?: number
+          created_at?: string | null
+          id?: string
+          merged_pull_requests?: number
+          open_issues?: number
+          pull_requests?: number
+          total_commits?: number
+          total_files?: number
+          total_lines?: number
+          updated_at?: string | null
+          velocity?: number | null
+        }
+        Update: {
+          average_issue_resolution_time?: number | null
+          burndown?: Json | null
+          closed_issues?: number
+          code_quality?: Json | null
+          contributors?: number
+          created_at?: string | null
+          id?: string
+          merged_pull_requests?: number
+          open_issues?: number
+          pull_requests?: number
+          total_commits?: number
+          total_files?: number
+          total_lines?: number
+          updated_at?: string | null
+          velocity?: number | null
+        }
+        Relationships: []
+      }
+      project_stages: {
+        Row: {
+          created_at: string | null
+          dependencies: string[] | null
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          owner: string | null
+          progress: number
+          start_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dependencies?: string[] | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          owner?: string | null
+          progress: number
+          start_date: string
+          status: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dependencies?: string[] | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          owner?: string | null
+          progress?: number
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      releases: {
+        Row: {
+          created_at: string | null
+          features: string[] | null
+          id: string
+          name: string
+          release_date: string
+          status: string
+          updated_at: string | null
+          version: string
+        }
+        Insert: {
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          name: string
+          release_date: string
+          status: string
+          updated_at?: string | null
+          version: string
+        }
+        Update: {
+          created_at?: string | null
+          features?: string[] | null
+          id?: string
+          name?: string
+          release_date?: string
+          status?: string
+          updated_at?: string | null
+          version?: string
+        }
+        Relationships: []
+      }
       roadmap_phases: {
         Row: {
           created_at: string | null
@@ -919,6 +1204,62 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      tasks: {
+        Row: {
+          actual_hours: number | null
+          assignee: string | null
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          estimated_hours: number | null
+          id: string
+          name: string
+          priority: string
+          stage_id: string
+          status: string
+          tags: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          actual_hours?: number | null
+          assignee?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_hours?: number | null
+          id?: string
+          name: string
+          priority: string
+          stage_id: string
+          status: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          actual_hours?: number | null
+          assignee?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_hours?: number | null
+          id?: string
+          name?: string
+          priority?: string
+          stage_id?: string
+          status?: string
+          tags?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "project_stages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       test_logs: {
         Row: {
