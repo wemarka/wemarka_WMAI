@@ -376,19 +376,31 @@ const GitHubMigrationImporter: React.FC = () => {
         <Button variant="outline" onClick={() => window.history.back()}>
           Back
         </Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            setFiles([]);
-            setSelectedFile(null);
-            setFileContent("");
-            setResult(null);
-            setError(null);
-          }}
-          disabled={files.length === 0 && !fileContent && !error && !result}
-        >
-          Clear
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              // Navigate to migration logs
+              window.location.href =
+                "/tempobook/storyboards/migration-logs-storyboard";
+            }}
+          >
+            View Logs
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setFiles([]);
+              setSelectedFile(null);
+              setFileContent("");
+              setResult(null);
+              setError(null);
+            }}
+            disabled={files.length === 0 && !fileContent && !error && !result}
+          >
+            Clear
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

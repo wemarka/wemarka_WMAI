@@ -68,6 +68,13 @@ export const githubApi = {
         return { success: false, sql: null, error };
       }
 
+      if (!data.content) {
+        return {
+          success: false,
+          error: "File content is empty or could not be decoded",
+        };
+      }
+
       return { success: true, sql: data.content, error: null };
     } catch (error: any) {
       console.error("Error in importMigrationFile:", error);

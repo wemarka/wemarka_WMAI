@@ -1001,6 +1001,34 @@ const MigrationRunner: React.FC = () => {
             "Run Custom SQL Migration"
           )}
         </Button>
+
+        <div className="flex justify-between w-full pt-4 border-t">
+          <Button variant="outline" onClick={() => window.history.back()}>
+            Back
+          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                // Navigate to migration logs
+                window.location.href =
+                  "/tempobook/storyboards/migration-logs-storyboard";
+              }}
+            >
+              View Logs
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSqlContent("");
+                setResult(null);
+              }}
+              disabled={!sqlContent && !result}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
       </CardFooter>
     </Card>
   );

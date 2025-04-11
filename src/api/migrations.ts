@@ -11,6 +11,53 @@ let migrationsApi: any;
  */
 migrationsApi = {
   /**
+   * Get migration logs from the database
+   * @returns Array of migration logs
+   */
+  getMigrationLogs: async (): Promise<{
+    success: boolean;
+    data?: any[];
+    error?: any;
+  }> => {
+    try {
+      // First check if the migration_logs table exists
+      const { data: tableExists, error: tableCheckError } = await supabase
+        .from("information_schema.tables")
+        .select("*")
+        .eq("table_schema", "public")
+        .eq("table_name", "migration_logs")
+        .single();
+
+      if (tableCheckError || !tableExists) {
+        console.warn("Migration logs table does not exist");
+        return {
+          success: false,
+          error: { message: "Migration logs table does not exist" },
+        };
+      }
+
+      // Fetch logs from the migration_logs table
+      const { data, error } = await supabase
+        .from("migration_logs")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching migration logs:", error);
+        return { success: false, error };
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error("Unexpected error fetching migration logs:", error);
+      return {
+        success: false,
+        error: { message: `Unexpected error: ${error.message}` },
+      };
+    }
+  },
+
+  /**
    * Log a migration operation to the migration_logs table
    * @param logEntry The log entry to insert
    */
