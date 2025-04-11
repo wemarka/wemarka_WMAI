@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "deploy": "supabase functions deploy execute-sql"
+  },
+  "importMap": "../import_map.json"
+}

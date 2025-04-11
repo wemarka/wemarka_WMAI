@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "deploy": "supabase functions deploy github-file-fetch"
+  },
+  "importMap": "../import_map.json"
+}

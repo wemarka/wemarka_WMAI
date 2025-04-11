@@ -1,0 +1,1 @@
+alter table migration_logs add column if not exists execution_time_ms integer;

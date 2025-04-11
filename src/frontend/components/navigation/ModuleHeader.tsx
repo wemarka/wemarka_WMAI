@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bell, Search, User, Moon, Sun, Menu } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { Input } from "@/frontend/components/ui/input";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
-import LanguageToggle from "@/frontend/components/ui/language-toggle";
+import { LanguageToggle } from "@/frontend/components/ui/language-toggle";
 
 interface ModuleHeaderProps {
   isDarkMode?: boolean;
@@ -17,6 +17,11 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const { selectedModule } = useSidebar();
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value);
+  };
 
   return (
     <header className="h-16 border-b bg-card shadow-sm flex items-center justify-between px-6">
@@ -35,6 +40,8 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
           <Input
             placeholder="Search..."
             className="pl-10 w-64 bg-background rounded-lg"
+            value={searchValue}
+            onChange={handleSearchChange}
           />
         </div>
 

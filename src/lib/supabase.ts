@@ -10,10 +10,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// Initialize the Supabase client
 let supabaseClient;
 try {
   if (supabaseUrl && supabaseAnonKey) {
-    supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+    supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+      },
+    });
     console.log("Supabase client initialized successfully");
   } else {
     throw new Error("Supabase credentials not found");
@@ -21,68 +27,22 @@ try {
 } catch (error) {
   console.error("Error initializing Supabase client:", error);
   // Create a minimal client that won't throw errors when methods are called
-  supabaseClient = {
-    from: (table: string) => {
-      console.warn(`Mock Supabase client used for table: ${table}`);
-      return {
-        select: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        insert: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        update: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        delete: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        eq: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        order: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        limit: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-        single: () => ({
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        }),
-      };
-    },
-    auth: {
-      getSession: async () => ({ data: { session: null }, error: null }),
-      getUser: async () => ({ data: { user: null }, error: null }),
-      onAuthStateChange: () => ({
-        data: { subscription: { unsubscribe: () => {} } },
-      }),
-      signIn: async () => ({
-        error: new Error("Supabase client initialization failed"),
-      }),
-      signUp: async () => ({
-        error: new Error("Supabase client initialization failed"),
-      }),
-      signOut: async () => {},
-    },
-    functions: {
-      invoke: async (name: string) => {
-        console.warn(`Mock Supabase function invoked: ${name}`);
-        return {
-          data: null,
-          error: { message: "Supabase client initialization failed" },
-        };
+  supabaseClient = createClient(
+    supabaseUrl || "https://placeholder.supabase.co",
+    supabaseAnonKey || "placeholder",
+    {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
       },
     },
-  };
+  );
 }
 
+// Create a properly structured export with all required methods and properties
 export const supabase = supabaseClient;
+
+// Add additional properties for easier access
+supabase.supabaseUrl = supabaseUrl;
+supabase.supabaseAnonKey = supabaseAnonKey;
+supabase.supabaseKey = supabaseAnonKey; // For compatibility with code expecting supabaseKey

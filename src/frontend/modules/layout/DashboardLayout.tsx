@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/frontend/lib/utils";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/frontend/contexts/AuthContext";
 import {
   Sun,
@@ -58,11 +58,12 @@ import StagingEnvironmentNotice from "@/frontend/components/StagingEnvironmentNo
 import FeedbackButton from "@/frontend/components/feedback/FeedbackButton";
 
 interface DashboardLayoutProps {
-  children: React.ReactNode;
   currentModule?: string;
   userName?: string;
   userRole?: string;
   userAvatar?: string;
+  searchValue?: string;
+  onSearch?: (value: string) => void;
 }
 
 // Wrapper component that provides the SidebarContext
@@ -81,6 +82,8 @@ const DashboardLayoutContent = ({
   userName,
   userRole = "System Admin",
   userAvatar,
+  searchValue = "",
+  onSearch,
 }: DashboardLayoutProps) => {
   const { user, signOut, isDevelopmentUser, useDevelopmentUser } = useAuth();
   const navigate = useNavigate();
@@ -105,7 +108,12 @@ const DashboardLayoutContent = ({
     setCurrentModule,
   } = useAI();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [searchValue, setSearchValue] = useState("");
+  const [localSearchValue, setLocalSearchValue] = useState(searchValue);
+
+  // Update local search value when prop changes
+  useEffect(() => {
+    setLocalSearchValue(searchValue);
+  }, [searchValue]);
 
   // Update time every minute
   useEffect(() => {
@@ -149,13 +157,20 @@ const DashboardLayoutContent = ({
   }, [currentModule, setCurrentModule]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
+    const value = e.target.value;
+    setLocalSearchValue(value);
+    if (onSearch) {
+      onSearch(value);
+    }
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality here
-    console.log("Searching for:", searchValue);
+    console.log("Searching for:", localSearchValue);
+    if (onSearch) {
+      onSearch(localSearchValue);
+    }
   };
 
   return (
@@ -207,7 +222,7 @@ const DashboardLayoutContent = ({
                 />
                 <input
                   type="text"
-                  value={searchValue}
+                  value={localSearchValue}
                   onChange={handleSearch}
                   placeholder={
                     rtl ? "بحث في كل شيء..." : "Search everything..."
@@ -468,7 +483,7 @@ const DashboardLayoutContent = ({
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-              {children}
+              <Outlet />
             </div>
           </main>
         </div>

@@ -14,6 +14,11 @@ export { default as ProjectAnalysisInsights } from "./components/ProjectAnalysis
 export { default as RoadmapHistory } from "./components/RoadmapHistory";
 export { default as RoadmapComparison } from "./components/RoadmapComparison";
 export { default as RoadmapComparisonEnhanced } from "./components/RoadmapComparisonEnhanced";
+export { default as DeveloperRoadmapDashboard } from "./components/DeveloperRoadmapDashboard";
+export { default as RoadmapVisualization } from "./components/RoadmapVisualization";
+export { default as ModuleIntegrationManager } from "./components/ModuleIntegrationManager";
+export { default as ModuleIntegrationVisualization } from "./components/ModuleIntegrationVisualization";
+export { default as RoadmapIntegrationDashboard } from "./components/RoadmapIntegrationDashboard";
 
 // Re-export ProjectAnalysis as default for backward compatibility
 import { ProjectAnalysis as DefaultProjectAnalysis } from "./components/ProjectAnalysis";

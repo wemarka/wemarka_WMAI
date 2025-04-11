@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { cn } from "@/frontend/lib/utils";
 import {
   ChevronLeft,
@@ -21,6 +21,10 @@ import {
   Code,
   Settings,
   Layers,
+  GitBranch,
+  Link as LinkIcon,
+  GitMerge,
+  Network,
 } from "lucide-react";
 import { Button } from "@/frontend/components/ui/button";
 import { useSidebar } from "@/frontend/contexts/SidebarContext";
@@ -210,6 +214,26 @@ const SubSidebar: React.FC<SubSidebarProps> = ({ collapsed = false }) => {
         name: isRTL ? "سجلات التطوير" : "Development Logs",
         path: "/dashboard/developer/logs",
       },
+      {
+        icon: <GitBranch />,
+        name: isRTL ? "خريطة طريق التطوير" : "Development Roadmap",
+        path: "/dashboard/developer/roadmap",
+      },
+      {
+        icon: <LinkIcon />,
+        name: isRTL ? "تكامل الوحدات" : "Module Integration",
+        path: "/dashboard/developer/integration",
+      },
+      {
+        icon: <Network />,
+        name: isRTL ? "تصور تكامل الوحدات" : "Module Integration Visualization",
+        path: "/dashboard/developer/integration-visualization",
+      },
+      {
+        icon: <GitMerge />,
+        name: isRTL ? "تكامل خريطة الطريق" : "Roadmap Integration",
+        path: "/dashboard/developer/roadmap-integration",
+      },
     ],
     Settings: [
       {
@@ -262,22 +286,18 @@ const SubSidebar: React.FC<SubSidebarProps> = ({ collapsed = false }) => {
         <ul className="space-y-1">
           {navItems.map((item, index) => (
             <li key={index}>
-              <a
-                href="#"
+              <Link
+                to={item.path}
                 className={cn(
                   "wemarka-sidebar-item",
                   item.isActive
                     ? "wemarka-sidebar-item-active"
                     : "wemarka-sidebar-item-inactive",
                 )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigate(item.path);
-                }}
               >
                 <div className="flex-shrink-0 w-5 h-5 mr-2">{item.icon}</div>
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
