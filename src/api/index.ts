@@ -14,15 +14,37 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // AI API handler
 export async function callOpenAI(prompt: string) {
   try {
-    // Call the Supabase Edge Function for AI processing
-    const { data, error } = await supabase.functions.invoke("code-analysis", {
-      body: { prompt },
-    });
+    // First try to use the Supabase Edge Function for AI processing
+    try {
+      const { data, error } = await supabase.functions.invoke("code-analysis", {
+        body: { prompt },
+      });
 
-    if (error) throw error;
-    return data;
+      if (error) throw error;
+      return data;
+    } catch (edgeFunctionError) {
+      console.warn(
+        "Edge function error, falling back to direct API call:",
+        edgeFunctionError,
+      );
+
+      // Fall back to direct API call if edge function fails
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      return await response.json();
+    }
   } catch (error) {
-    console.error("Error calling OpenAI via Supabase Edge Function:", error);
+    console.error("Error calling OpenAI:", error);
     throw error;
   }
 }

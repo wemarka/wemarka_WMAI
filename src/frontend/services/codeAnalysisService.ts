@@ -79,7 +79,6 @@ export const analyzeCode = async (
     }
     // First try to use the dedicated code-analysis edge function
     try {
-      const { supabase } = await import("@/lib/supabase");
       const { data, error } = await supabase.functions.invoke("code-analysis", {
         body: request,
       });
@@ -164,7 +163,7 @@ export const analyzeCode = async (
   "summary": "Overall summary of the analysis"
 }`;
 
-    // Call the Supabase Edge Function for code analysis
+    // Call the OpenAI API through our API wrapper
     const { callOpenAI } = await import("@/api");
     const data = await callOpenAI(prompt);
     const aiResponse = data?.choices?.[0]?.message?.content;
@@ -211,7 +210,6 @@ export const analyzeCode = async (
 
     // Save the analysis result to Supabase
     try {
-      const { supabase } = await import("@/lib/supabase");
       await supabase.from("code_analysis_results").insert({
         analysis_type: request.analysisType,
         code_snippet: request.codeSnippet,
