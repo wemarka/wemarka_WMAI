@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { executeSql } from "@/utils/dbUtils";
 
 /**
  * Comprehensive diagnostic tool to identify issues with SQL execution
@@ -8,8 +9,12 @@ export const diagnosticTool = {
    * Run a complete diagnostic check of all SQL execution methods
    */
   runFullDiagnostic: async () => {
+    const startTime = Date.now();
+    const operationId = `diagnostic-run-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
     const results: any = {
       timestamp: new Date().toISOString(),
+      operationId,
       supabaseConfig: await diagnosticTool.checkSupabaseConfig(),
       basicConnection: await diagnosticTool.testBasicConnection(),
       rpcFunctions: await diagnosticTool.testRpcFunctions(),
@@ -27,7 +32,10 @@ export const diagnosticTool = {
     };
 
     // Check if any method works
-    if (results.directSqlExecution.pgQueryWorks) {
+    if (results.directSqlExecution.dbUtilsWorks) {
+      results.summary.hasWorkingMethod = true;
+      results.summary.recommendedMethod = "dbUtils.executeSql";
+    } else if (results.directSqlExecution.pgQueryWorks) {
       results.summary.hasWorkingMethod = true;
       results.summary.recommendedMethod = "pg_query";
     } else if (results.directSqlExecution.execSqlWorks) {
@@ -88,7 +96,98 @@ export const diagnosticTool = {
       );
     }
 
+    // Calculate execution time
+    const executionTimeMs = Date.now() - startTime;
+    results.executionTimeMs = executionTimeMs;
+
+    // Log the diagnostic operation
+    try {
+      // Check if diagnostic_logs table exists
+      const { data: tableExists, error: tableCheckError } = await supabase.rpc(
+        "pg_query",
+        {
+          query:
+            "SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'diagnostic_logs' LIMIT 1",
+        },
+      );
+
+      if (!tableCheckError && tableExists && tableExists.length > 0) {
+        // Log the operation
+        await supabase
+          .from("diagnostic_logs")
+          .insert({
+            operation_id: operationId,
+            operation_type: "full_diagnostic",
+            status:
+              results.summary.criticalIssues.length > 0 ? "failed" : "success",
+            method_used: "diagnosticTool",
+            execution_time_ms: executionTimeMs,
+            details: results,
+            created_at: new Date().toISOString(),
+          })
+          .catch((err) =>
+            console.error("Failed to log diagnostic operation:", err),
+          );
+      }
+    } catch (logError) {
+      console.error("Error logging diagnostic operation:", logError);
+    }
+
     return results;
+  },
+
+  /**
+   * Log a diagnostic operation
+   */
+  logDiagnosticOperation: async (
+    operationType: string,
+    status: string,
+    details: any,
+  ) => {
+    const operationId = `diagnostic-${operationType}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const executionTimeMs = details.executionTimeMs || 0;
+
+    try {
+      // Check if diagnostic_logs table exists
+      const { data: tableExists, error: tableCheckError } = await supabase.rpc(
+        "pg_query",
+        {
+          query:
+            "SELECT * FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'diagnostic_logs' LIMIT 1",
+        },
+      );
+
+      if (tableCheckError || !tableExists || tableExists.length === 0) {
+        console.warn(
+          "Diagnostic logs table does not exist, cannot log operation",
+        );
+        return {
+          success: false,
+          error: "Diagnostic logs table does not exist",
+        };
+      }
+
+      // Log the operation
+      const { data, error } = await supabase.from("diagnostic_logs").insert({
+        operation_id: operationId,
+        operation_type: operationType,
+        status,
+        method_used: details.method || "manual",
+        execution_time_ms: executionTimeMs,
+        details,
+        created_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.error("Failed to log diagnostic operation:", error);
+        return { success: false, error };
+      }
+
+      return { success: true, operationId };
+    } catch (error) {
+      console.error("Error logging diagnostic operation:", error);
+      return { success: false, error };
+    }
   },
 
   /**
@@ -305,6 +404,7 @@ export const diagnosticTool = {
       pgQueryWorks: false,
       execSqlWorks: false,
       directRestWorks: false,
+      dbUtilsWorks: false,
     };
 
     // Test pg_query
@@ -333,6 +433,18 @@ export const diagnosticTool = {
     } catch (error) {
       results.execSqlWorks = false;
       results.execSqlError = error;
+    }
+
+    // Test dbUtils.executeSql
+    try {
+      const { data, error } = await executeSql("SELECT 1 as test");
+
+      results.dbUtilsWorks = !error;
+      results.dbUtilsError = error;
+      results.dbUtilsData = data;
+    } catch (error) {
+      results.dbUtilsWorks = false;
+      results.dbUtilsError = error;
     }
 
     // Test direct REST API call
@@ -422,7 +534,18 @@ export const diagnosticTool = {
    * Execute SQL using the best available method
    */
   executeSql: async (sql: string) => {
-    // Try pg_query first
+    // Try dbUtils.executeSql first
+    try {
+      const { data, error } = await executeSql(sql);
+
+      if (!error) {
+        return { success: true, data, method: "dbUtils.executeSql" };
+      }
+    } catch (dbUtilsError) {
+      // Fall through to next method
+    }
+
+    // Try pg_query next
     try {
       const { data, error } = await supabase.rpc("pg_query", {
         query: sql,

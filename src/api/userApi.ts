@@ -11,8 +11,9 @@ export const userApi = {
   getCurrentUser: async (req: any, res: any) => {
     try {
       // Validate user session
-      const { data: session, error: sessionError } = await req.supabase.auth.getSession();
-      
+      const { data: session, error: sessionError } =
+        await req.supabase.auth.getSession();
+
       if (sessionError || !session.session) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -40,8 +41,9 @@ export const userApi = {
   getAllUsers: async (req: any, res: any) => {
     try {
       // Validate user session
-      const { data: session, error: sessionError } = await req.supabase.auth.getSession();
-      
+      const { data: session, error: sessionError } =
+        await req.supabase.auth.getSession();
+
       if (sessionError || !session.session) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -52,10 +54,14 @@ export const userApi = {
         .select("role")
         .eq("user_id", session.session.user.id);
 
-      const isAdmin = roles?.some(r => ['admin', 'superadmin'].includes(r.role));
+      const isAdmin = roles?.some((r) =>
+        ["admin", "superadmin"].includes(r.role),
+      );
 
       if (!isAdmin) {
-        return res.status(403).json({ error: "Forbidden. Admin access required." });
+        return res
+          .status(403)
+          .json({ error: "Forbidden. Admin access required." });
       }
 
       const { data, error } = await userService.getAllUsers();
@@ -77,8 +83,9 @@ export const userApi = {
   getUserById: async (req: any, res: any) => {
     try {
       // Validate user session
-      const { data: session, error: sessionError } = await req.supabase.auth.getSession();
-      
+      const { data: session, error: sessionError } =
+        await req.supabase.auth.getSession();
+
       if (sessionError || !session.session) {
         return res.status(401).json({ error: "Unauthorized" });
       }
@@ -89,10 +96,14 @@ export const userApi = {
         .select("role")
         .eq("user_id", session.session.user.id);
 
-      const isAdmin = roles?.some(r => ['admin', 'superadmin'].includes(r.role));
+      const isAdmin = roles?.some((r) =>
+        ["admin", "superadmin"].includes(r.role),
+      );
 
       if (!isAdmin) {
-        return res.status(403).json({ error: "Forbidden. Admin access required." });
+        return res
+          .status(403)
+          .json({ error: "Forbidden. Admin access required." });
       }
 
       const { id } = req.params;
@@ -108,4 +119,13 @@ export const userApi = {
       }
 
       if (!data) {
-        return res
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      return res.status(200).json(data);
+    } catch (error: any) {
+      console.error("Error in getUserById API:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  },
+};

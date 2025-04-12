@@ -25,11 +25,21 @@ if (!functionName) {
 // Access environment variables directly
 const SUPABASE_PROJECT_ID =
   process.env.SUPABASE_PROJECT_ID || process.env.VITE_SUPABASE_PROJECT_ID;
-const SUPABASE_SERVICE_KEY =
-  process.env.SUPABASE_SERVICE_KEY ||
-  process.env.VITE_SUPABASE_SERVICE_KEY ||
-  process.env.SUPABASE_ANON_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY;
+
+// Important: For authentication with Supabase Management API, we must use the service key
+// The anon key will not work for management operations
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
+
+// If service key is not available, try fallbacks (though these likely won't work for management API)
+if (!SUPABASE_SERVICE_KEY) {
+  console.error(
+    "❌ ERROR: SUPABASE_SERVICE_KEY not found. This key is required for deploying functions.",
+  );
+  console.error(
+    "   Please ensure you have set the correct SUPABASE_SERVICE_KEY environment variable.",
+  );
+  process.exit(1);
+}
 
 // Log environment variable status
 console.log(
@@ -39,9 +49,26 @@ console.log(
   `Using Service Key: ${SUPABASE_SERVICE_KEY ? "✓ Found" : "✗ Missing"}`,
 );
 
-if (!SUPABASE_PROJECT_ID || !SUPABASE_SERVICE_KEY) {
+// Validate service key format (basic check)
+if (SUPABASE_SERVICE_KEY && !SUPABASE_SERVICE_KEY.startsWith("eyJ")) {
   console.error(
-    "Missing required environment variables: SUPABASE_PROJECT_ID and SUPABASE_SERVICE_KEY",
+    "❌ ERROR: SUPABASE_SERVICE_KEY doesn't appear to be in the correct format.",
+  );
+  console.error(
+    "   Service keys typically start with 'eyJ' and are JWT tokens.",
+  );
+  console.error(
+    "   Please check your project settings and ensure you're using the service_role key, not the anon key.",
+  );
+  process.exit(1);
+}
+
+if (!SUPABASE_PROJECT_ID) {
+  console.error(
+    "❌ ERROR: SUPABASE_PROJECT_ID not found. This is required for deploying functions.",
+  );
+  console.error(
+    "   Please ensure you have set the correct SUPABASE_PROJECT_ID environment variable.",
   );
   process.exit(1);
 }
@@ -177,6 +204,12 @@ async function deployFunction(functionCode) {
         );
         console.error(
           "   Please check your SUPABASE_SERVICE_KEY environment variable.",
+        );
+        console.error(
+          "   Make sure you're using the service_role key from your Supabase project settings, not the anon key.",
+        );
+        console.error(
+          "   The service key should start with 'eyJ' and is a JWT token.",
         );
       } else if (response.status === 404) {
         console.error(

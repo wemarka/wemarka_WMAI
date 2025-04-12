@@ -29,6 +29,7 @@ import MigrationRunner from "@/components/MigrationRunner";
 import GitHubMigrationImporter from "@/components/GitHubMigrationImporter";
 import GitHubMigrationLogs from "@/components/GitHubMigrationLogs";
 import DiagnosticPanel from "@/components/DiagnosticPanel";
+import MigrationSystemInitializer from "@/components/MigrationSystemInitializer";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
 import UserAnalyticsDashboard from "@/frontend/modules/admin/components/UserAnalyticsDashboard";
 
@@ -197,6 +198,14 @@ function App() {
                   element={<GitHubMigrationLogs />}
                 />
                 <Route path="diagnostics" element={<DiagnosticPanel />} />
+                <Route
+                  path="migration-setup"
+                  element={<MigrationSystemInitializer />}
+                />
+                <Route
+                  path="diagnostic-logs"
+                  element={<DiagnosticLogsViewer />}
+                />
               </Route>
               <Route
                 path="dashboard/settings/*"

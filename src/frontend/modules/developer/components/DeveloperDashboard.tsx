@@ -20,6 +20,8 @@ import {
   Github,
   Play,
   History,
+  Settings,
+  Server,
 } from "lucide-react";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
@@ -206,6 +208,25 @@ const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
                 <Link to="/dashboard/developer/migration-logs">
                   <History className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
                   {isRTL ? "سجلات الترحيل" : "Migration Logs"}
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <Button asChild variant="outline">
+                <Link to="/dashboard/developer/migration-dashboard">
+                  {isRTL ? "لوحة تحكم الترحيل" : "Migration Dashboard"}
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/dashboard/developer/migration-setup">
+                  <Settings className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                  {isRTL ? "إعداد نظام الترحيل" : "Migration Setup"}
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/dashboard/developer/diagnostic-logs">
+                  <Server className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                  {isRTL ? "سجلات التشخيص" : "Diagnostic Logs"}
                 </Link>
               </Button>
             </div>

@@ -1,12 +1,36 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/frontend/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/ui/tabs';
-import { Button } from '@/frontend/components/ui/button';
-import { Input } from '@/frontend/components/ui/input';
-import { Select } from '@/frontend/components/ui/select';
-import { Badge } from '@/frontend/components/ui/badge';
-import { Separator } from '@/frontend/components/ui/separator';
-import { BarChart, LineChart, PieChart, ArrowUpRight, ArrowDownRight, Download, Calendar, Filter, RefreshCw, Zap, Share2 } from 'lucide-react';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/frontend/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/frontend/components/ui/tabs";
+import { Button } from "@/frontend/components/ui/button";
+import { Input } from "@/frontend/components/ui/input";
+import { Select } from "@/frontend/components/ui/select";
+import { Badge } from "@/frontend/components/ui/badge";
+import { Separator } from "@/frontend/components/ui/separator";
+import {
+  BarChart,
+  LineChart,
+  PieChart,
+  ArrowUpRight,
+  ArrowDownRight,
+  Download,
+  Calendar,
+  Filter,
+  RefreshCw,
+  Zap,
+  Share2,
+} from "lucide-react";
 
 const AnalyticsWireframe = () => {
   return (
@@ -14,7 +38,9 @@ const AnalyticsWireframe = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">Track and analyze your business performance</p>
+          <p className="text-muted-foreground">
+            Track and analyze your business performance
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center bg-muted rounded-md p-1">
@@ -64,7 +90,7 @@ const AnalyticsWireframe = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -84,10 +110,12 @@ const AnalyticsWireframe = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Conversion Rate
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
@@ -104,10 +132,12 @@ const AnalyticsWireframe = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Order Value</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg. Order Value
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-center">
@@ -133,7 +163,7 @@ const AnalyticsWireframe = () => {
           <TabsTrigger value="customers">Customer Insights</TabsTrigger>
           <TabsTrigger value="inventory">Inventory Analysis</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="sales" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-2">
@@ -141,7 +171,9 @@ const AnalyticsWireframe = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Revenue Over Time</CardTitle>
-                    <CardDescription>Monthly revenue for the past year</CardDescription>
+                    <CardDescription>
+                      Monthly revenue for the past year
+                    </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm">
@@ -156,13 +188,18 @@ const AnalyticsWireframe = () => {
                 <div className="w-full aspect-[3/2] bg-muted/30 rounded-lg flex items-center justify-center border border-dashed">
                   <div className="text-center p-4">
                     <LineChart className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">Revenue chart visualization</p>
-                    <p className="text-xs text-muted-foreground">Shows monthly revenue trends with year-over-year comparison</p>
+                    <p className="text-muted-foreground">
+                      Revenue chart visualization
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Shows monthly revenue trends with year-over-year
+                      comparison
+                    </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="space-y-6">
               <Card>
                 <CardHeader>
@@ -170,16 +207,25 @@ const AnalyticsWireframe = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {Array.from({length: 5}).map((_, i) => (
-                      <div key={i} className="flex items-center justify-between">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between"
+                      >
                         <div className="flex items-center gap-2">
                           <div className="w-8 h-8 bg-muted rounded" />
                           <div>
-                            <p className="text-sm font-medium">Product {i + 1}</p>
-                            <p className="text-xs text-muted-foreground">{50 - i * 5} units</p>
+                            <p className="text-sm font-medium">
+                              Product {i + 1}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {50 - i * 5} units
+                            </p>
                           </div>
                         </div>
-                        <p className="font-medium">${(100 - i * 10).toFixed(2)}</p>
+                        <p className="font-medium">
+                          ${(100 - i * 10).toFixed(2)}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -190,7 +236,7 @@ const AnalyticsWireframe = () => {
                   </Button>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Sales by Channel</CardTitle>
@@ -200,10 +246,12 @@ const AnalyticsWireframe = () => {
                   <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed mb-4">
                     <div className="text-center p-4">
                       <PieChart className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-xs text-muted-foreground">Distribution of sales across channels</p>
+                      <p className="text-xs text-muted-foreground">
+                        Distribution of sales across channels
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -239,7 +287,7 @@ const AnalyticsWireframe = () => {
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="marketing" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <Card className="lg:col-span-8">
@@ -247,7 +295,9 @@ const AnalyticsWireframe = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Campaign Performance</CardTitle>
-                    <CardDescription>ROI and conversion metrics for marketing campaigns</CardDescription>
+                    <CardDescription>
+                      ROI and conversion metrics for marketing campaigns
+                    </CardDescription>
                   </div>
                   <div className="flex items-center gap-2">
                     <select className="border rounded p-1 text-sm bg-background">
@@ -268,7 +318,9 @@ const AnalyticsWireframe = () => {
                         <th className="text-right p-2 font-medium">Spend</th>
                         <th className="text-right p-2 font-medium">Revenue</th>
                         <th className="text-right p-2 font-medium">ROI</th>
-                        <th className="text-right p-2 font-medium">Conv. Rate</th>
+                        <th className="text-right p-2 font-medium">
+                          Conv. Rate
+                        </th>
                         <th className="text-right p-2 font-medium">Status</th>
                       </tr>
                     </thead>
@@ -281,7 +333,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right text-green-600">4.0x</td>
                         <td className="p-2 text-right">3.2%</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Active
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -292,7 +346,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right text-green-600">3.8x</td>
                         <td className="p-2 text-right">2.9%</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Active
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -303,7 +359,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right text-green-600">3.75x</td>
                         <td className="p-2 text-right">4.1%</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Active</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Active
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -314,7 +372,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right text-green-600">3.0x</td>
                         <td className="p-2 text-right">2.5%</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Paused</Badge>
+                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                            Paused
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -325,7 +385,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right text-yellow-600">1.5x</td>
                         <td className="p-2 text-right">1.8%</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Ended</Badge>
+                          <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                            Ended
+                          </Badge>
                         </td>
                       </tr>
                     </tbody>
@@ -333,7 +395,7 @@ const AnalyticsWireframe = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="lg:col-span-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -344,10 +406,12 @@ const AnalyticsWireframe = () => {
                   <div className="w-full aspect-[4/3] bg-muted/30 rounded-lg flex items-center justify-center border border-dashed mb-4">
                     <div className="text-center p-4">
                       <BarChart className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-xs text-muted-foreground">ROI comparison by marketing channel</p>
+                      <p className="text-xs text-muted-foreground">
+                        ROI comparison by marketing channel
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <p className="text-sm">Facebook</p>
@@ -374,7 +438,7 @@ const AnalyticsWireframe = () => {
                   </Button>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Campaign Insights</CardTitle>
@@ -383,15 +447,24 @@ const AnalyticsWireframe = () => {
                   <div className="space-y-4">
                     <div className="p-3 bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300 rounded-lg">
                       <p className="text-sm font-medium">Opportunity</p>
-                      <p className="text-sm mt-1">Increasing budget for Google campaigns could yield 15% more conversions based on current performance.</p>
+                      <p className="text-sm mt-1">
+                        Increasing budget for Google campaigns could yield 15%
+                        more conversions based on current performance.
+                      </p>
                     </div>
                     <div className="p-3 bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300 rounded-lg">
                       <p className="text-sm font-medium">Warning</p>
-                      <p className="text-sm mt-1">TikTok campaign performance has declined by 12% in the past week.</p>
+                      <p className="text-sm mt-1">
+                        TikTok campaign performance has declined by 12% in the
+                        past week.
+                      </p>
                     </div>
                     <div className="p-3 bg-green-50 text-green-800 dark:bg-green-950 dark:text-green-300 rounded-lg">
                       <p className="text-sm font-medium">Success</p>
-                      <p className="text-sm mt-1">Instagram story ads are outperforming feed ads by 23% in terms of engagement.</p>
+                      <p className="text-sm mt-1">
+                        Instagram story ads are outperforming feed ads by 23% in
+                        terms of engagement.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -399,7 +472,7 @@ const AnalyticsWireframe = () => {
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="customers" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <Card className="lg:col-span-8">
@@ -407,7 +480,9 @@ const AnalyticsWireframe = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Customer Segments</CardTitle>
-                    <CardDescription>Analysis of customer behavior and demographics</CardDescription>
+                    <CardDescription>
+                      Analysis of customer behavior and demographics
+                    </CardDescription>
                   </div>
                   <Button variant="outline" size="sm">
                     <Share2 className="mr-2 h-4 w-4" />
@@ -419,51 +494,69 @@ const AnalyticsWireframe = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Chart placeholder - Customer Age Distribution */}
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Age Distribution</h3>
+                    <h3 className="text-sm font-medium mb-2">
+                      Age Distribution
+                    </h3>
                     <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed">
                       <div className="text-center p-4">
                         <BarChart className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-xs text-muted-foreground">Customer age distribution chart</p>
+                        <p className="text-xs text-muted-foreground">
+                          Customer age distribution chart
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Chart placeholder - Customer Geography */}
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Geographic Distribution</h3>
+                    <h3 className="text-sm font-medium mb-2">
+                      Geographic Distribution
+                    </h3>
                     <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed">
                       <div className="text-center p-4">
-                        <div className="h-8 w-8 mx-auto mb-2 text-muted-foreground">🌎</div>
-                        <p className="text-xs text-muted-foreground">Customer location map</p>
+                        <div className="h-8 w-8 mx-auto mb-2 text-muted-foreground">
+                          🌎
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Customer location map
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Chart placeholder - Purchase Frequency */}
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Purchase Frequency</h3>
+                    <h3 className="text-sm font-medium mb-2">
+                      Purchase Frequency
+                    </h3>
                     <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed">
                       <div className="text-center p-4">
                         <LineChart className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-xs text-muted-foreground">Purchase frequency distribution</p>
+                        <p className="text-xs text-muted-foreground">
+                          Purchase frequency distribution
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Chart placeholder - Customer Lifetime Value */}
                   <div>
-                    <h3 className="text-sm font-medium mb-2">Customer Lifetime Value</h3>
+                    <h3 className="text-sm font-medium mb-2">
+                      Customer Lifetime Value
+                    </h3>
                     <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed">
                       <div className="text-center p-4">
                         <BarChart className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                        <p className="text-xs text-muted-foreground">CLV by customer segment</p>
+                        <p className="text-xs text-muted-foreground">
+                          CLV by customer segment
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="lg:col-span-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -476,31 +569,39 @@ const AnalyticsWireframe = () => {
                         <h3 className="font-medium">Loyal Customers</h3>
                         <Badge>32%</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">Purchased 5+ times in the last year</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Purchased 5+ times in the last year
+                      </p>
                     </div>
-                    
+
                     <div className="p-3 rounded-lg border">
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium">New Customers</h3>
                         <Badge>28%</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">First purchase in the last 30 days</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        First purchase in the last 30 days
+                      </p>
                     </div>
-                    
+
                     <div className="p-3 rounded-lg border">
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium">At-Risk</h3>
                         <Badge>15%</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">No purchase in 60+ days</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        No purchase in 60+ days
+                      </p>
                     </div>
-                    
+
                     <div className="p-3 rounded-lg border">
                       <div className="flex items-center justify-between">
                         <h3 className="font-medium">High-Value</h3>
                         <Badge>8%</Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">Average order value >$200</p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Average order value {">"}$200
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -511,7 +612,7 @@ const AnalyticsWireframe = () => {
                   </Button>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Customer Insights</CardTitle>
@@ -548,7 +649,7 @@ const AnalyticsWireframe = () => {
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="inventory" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <Card className="lg:col-span-8">
@@ -556,9 +657,14 @@ const AnalyticsWireframe = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle>Inventory Status</CardTitle>
-                    <CardDescription>Stock levels and product performance</CardDescription>
+                    <CardDescription>
+                      Stock levels and product performance
+                    </CardDescription>
                   </div>
-                  <Input placeholder="Search products..." className="max-w-xs" />
+                  <Input
+                    placeholder="Search products..."
+                    className="max-w-xs"
+                  />
                 </div>
               </CardHeader>
               <CardContent>
@@ -569,8 +675,12 @@ const AnalyticsWireframe = () => {
                         <th className="text-left p-2 font-medium">Product</th>
                         <th className="text-left p-2 font-medium">Category</th>
                         <th className="text-right p-2 font-medium">In Stock</th>
-                        <th className="text-right p-2 font-medium">Reorder Point</th>
-                        <th className="text-right p-2 font-medium">Sales (30d)</th>
+                        <th className="text-right p-2 font-medium">
+                          Reorder Point
+                        </th>
+                        <th className="text-right p-2 font-medium">
+                          Sales (30d)
+                        </th>
                         <th className="text-right p-2 font-medium">Status</th>
                       </tr>
                     </thead>
@@ -582,7 +692,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right">20</td>
                         <td className="p-2 text-right">78</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Healthy</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Healthy
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -592,7 +704,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right">15</td>
                         <td className="p-2 text-right">34</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Low Stock</Badge>
+                          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                            Low Stock
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -602,7 +716,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right">10</td>
                         <td className="p-2 text-right">22</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Out of Stock</Badge>
+                          <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+                            Out of Stock
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -612,7 +728,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right">25</td>
                         <td className="p-2 text-right">12</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Overstocked</Badge>
+                          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+                            Overstocked
+                          </Badge>
                         </td>
                       </tr>
                       <tr className="border-b">
@@ -622,7 +740,9 @@ const AnalyticsWireframe = () => {
                         <td className="p-2 text-right">20</td>
                         <td className="p-2 text-right">45</td>
                         <td className="p-2 text-right">
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Healthy</Badge>
+                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                            Healthy
+                          </Badge>
                         </td>
                       </tr>
                     </tbody>
@@ -630,7 +750,7 @@ const AnalyticsWireframe = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             <div className="lg:col-span-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -641,10 +761,12 @@ const AnalyticsWireframe = () => {
                   <div className="w-full aspect-square bg-muted/30 rounded-lg flex items-center justify-center border border-dashed mb-4">
                     <div className="text-center p-4">
                       <PieChart className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                      <p className="text-xs text-muted-foreground">Inventory status distribution</p>
+                      <p className="text-xs text-muted-foreground">
+                        Inventory status distribution
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -683,7 +805,7 @@ const AnalyticsWireframe = () => {
                   </Button>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Inventory Alerts</CardTitle>
@@ -691,16 +813,28 @@ const AnalyticsWireframe = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <div className="p-3 bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300 rounded-lg">
-                      <p className="text-sm font-medium">Out of Stock (3 items)</p>
-                      <p className="text-sm mt-1">Product C, Product F, Product H need to be restocked immediately.</p>
+                      <p className="text-sm font-medium">
+                        Out of Stock (3 items)
+                      </p>
+                      <p className="text-sm mt-1">
+                        Product C, Product F, Product H need to be restocked
+                        immediately.
+                      </p>
                     </div>
                     <div className="p-3 bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300 rounded-lg">
                       <p className="text-sm font-medium">Low Stock (5 items)</p>
-                      <p className="text-sm mt-1">Product B, Product G and 3 other products are below reorder point.</p>
+                      <p className="text-sm mt-1">
+                        Product B, Product G and 3 other products are below
+                        reorder point.
+                      </p>
                     </div>
                     <div className="p-3 bg-blue-50 text-blue-800 dark:bg-blue-950 dark:text-blue-300 rounded-lg">
-                      <p className="text-sm font-medium">Slow Moving (4 items)</p>
-                      <p className="text-sm mt-1">Product D and 3 other products have low sales velocity.</p>
+                      <p className="text-sm font-medium">
+                        Slow Moving (4 items)
+                      </p>
+                      <p className="text-sm mt-1">
+                        Product D and 3 other products have low sales velocity.
+                      </p>
                     </div>
                   </div>
                 </CardContent>

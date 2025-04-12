@@ -3,21 +3,32 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.6";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, authorization, x-client-info, apikey",
+    "Content-Type, Authorization, x-client-info, apikey",
   "Access-Control-Max-Age": "86400",
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 204,
+    return new Response("ok", {
+      status: 200,
       headers: corsHeaders,
     });
   }
 
   try {
+    // Get request body
+    const { sql, operation_id } = await req.json();
+
+    if (!sql) {
+      return new Response(JSON.stringify({ error: "SQL query is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     // Track execution time
     const startTime = Date.now();
 
@@ -28,20 +39,13 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_KEY") ||
       Deno.env.get("SUPABASE_ANON_KEY");
 
-    // Validate credentials
     if (!supabaseUrl || !supabaseServiceKey) {
-      console.error("Missing Supabase credentials in edge function:", {
-        hasUrl: !!supabaseUrl,
-        hasKey: !!supabaseServiceKey,
-      });
-
       return new Response(
         JSON.stringify({
-          error: "Supabase credentials not found in edge function environment",
+          error: "Supabase credentials not found",
           details: {
             hasUrl: !!supabaseUrl,
             hasKey: !!supabaseServiceKey,
-            availableEnvVars: Object.keys(Deno.env.toObject()),
           },
         }),
         {
@@ -51,165 +55,73 @@ serve(async (req) => {
       );
     }
 
-    // Create a Supabase client with the Admin key
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
+    // Create Supabase client
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
-      global: {
-        headers: {
-          apikey: supabaseServiceKey,
-          Authorization: `Bearer ${supabaseServiceKey}`,
-        },
-      },
     });
 
-    // Get the request body
-    const requestData = await req.json();
-    const sql = requestData.sql || requestData.sql_text; // Support both parameter names
-    const operationId =
-      requestData.operation_id ||
-      `sql-exec-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    // Execute SQL
+    let result;
+    let error = null;
 
-    if (!sql) {
-      return new Response(JSON.stringify({ error: "SQL query is required" }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
-    }
-
-    // Execute the SQL query directly using the service role
-    let data, error;
     try {
-      const result = await supabaseClient.rpc("exec_sql", { sql_text: sql });
-      data = result.data;
-      error = result.error;
-    } catch (e) {
-      error = e;
+      // Try to execute the SQL directly
+      const { data, error: execError } = await supabase.rpc("exec_sql", {
+        sql_text: sql,
+      });
+
+      if (execError) {
+        error = execError;
+      } else {
+        result = data;
+      }
+    } catch (err) {
+      error = err;
     }
 
-    if (error) {
-      // If the exec_sql function doesn't exist, create it
-      if (
-        error.message?.includes("function exec_sql") ||
-        error.message?.includes("does not exist")
-      ) {
-        const createFunctionSql = `
-          CREATE OR REPLACE FUNCTION exec_sql(sql_text text)
-          RETURNS void
-          LANGUAGE plpgsql
-          SECURITY DEFINER
-          SET search_path = public
-          AS $$
-          BEGIN
-            EXECUTE sql_text;
-          END;
-          $$;
-          
-          -- Grant appropriate permissions
-          GRANT EXECUTE ON FUNCTION exec_sql(text) TO service_role;
-          GRANT EXECUTE ON FUNCTION exec_sql(text) TO authenticated;
-          
-          -- Add function description
-          COMMENT ON FUNCTION exec_sql(text) IS 'Executes arbitrary SQL with security definer privileges | تنفيذ استعلامات SQL مع امتيازات أمان محددة';
-        `;
+    // Calculate execution time
+    const executionTimeMs = Date.now() - startTime;
 
-        // Try direct SQL execution first
-        try {
-          // Execute the SQL directly using pg_query
-          const { error: createError } = await supabaseClient.rpc("pg_query", {
-            query: createFunctionSql,
+    // Log the operation
+    if (operation_id) {
+      try {
+        const logEntry = {
+          operation_id,
+          operation_type: "edge_function_sql",
+          sql_content: sql,
+          sql_preview: sql.length > 100 ? `${sql.substring(0, 100)}...` : sql,
+          status: error ? "failed" : "success",
+          method_used: "execute-sql-edge-function",
+          execution_time_ms: executionTimeMs,
+          details: error ? { error } : { success: true },
+          created_at: new Date().toISOString(),
+        };
+
+        await supabase
+          .from("migration_logs")
+          .insert(logEntry)
+          .catch((e) => {
+            console.error("Failed to log operation:", e);
           });
-
-          if (createError) {
-            // If pg_query fails, try direct REST API call
-            const response = await fetch(
-              `${supabaseUrl}/rest/v1/rpc/pg_query`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  apikey: supabaseServiceKey,
-                  Authorization: `Bearer ${supabaseServiceKey}`,
-                  Prefer: "return=minimal",
-                },
-                body: JSON.stringify({ query: createFunctionSql }),
-              },
-            );
-
-            if (!response.ok) {
-              return new Response(
-                JSON.stringify({
-                  error: `Failed to create exec_sql function: ${await response.text()}`,
-                }),
-                {
-                  headers: {
-                    ...corsHeaders,
-                    "Content-Type": "application/json",
-                  },
-                  status: 500,
-                },
-              );
-            }
-          }
-
-          // Try executing the original SQL again
-          const { data: retryData, error: retryError } =
-            await supabaseClient.rpc("exec_sql", { sql_text: sql });
-
-          if (retryError) {
-            return new Response(
-              JSON.stringify({
-                error: `Failed to execute SQL after creating function: ${retryError.message}`,
-              }),
-              {
-                headers: { ...corsHeaders, "Content-Type": "application/json" },
-                status: 500,
-              },
-            );
-          }
-
-          // Log successful execution with execution time
-          try {
-            const executionTimeMs = Date.now() - startTime;
-            await supabaseClient.from("migration_logs").insert({
-              operation_id: operationId,
-              operation_type: "custom_sql",
-              sql_content: sql,
-              status: "success",
-              method_used: "edge-function",
-              execution_time_ms: executionTimeMs,
-              details: { auto_created_function: true },
-              created_at: new Date().toISOString(),
-            });
-          } catch (logError) {
-            console.error("Failed to log SQL execution:", logError);
-          }
-
-          return new Response(
-            JSON.stringify({ success: true, data: retryData }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 200,
-            },
-          );
-        } catch (createFunctionError) {
-          return new Response(
-            JSON.stringify({
-              error: `Failed to create exec_sql function: ${createFunctionError.message}`,
-              details: createFunctionError,
-            }),
-            {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-              status: 500,
-            },
-          );
-        }
+      } catch (logError) {
+        console.error("Error logging operation:", logError);
       }
+    }
 
+    // Return the result
+    if (error) {
       return new Response(
-        JSON.stringify({ error: `Failed to execute SQL: ${error.message}` }),
+        JSON.stringify({
+          success: false,
+          error: error.message || JSON.stringify(error),
+          details: {
+            executionTimeMs,
+            error,
+          },
+        }),
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 500,
@@ -217,31 +129,30 @@ serve(async (req) => {
       );
     }
 
-    // Log successful execution with execution time
-    try {
-      const executionTimeMs = Date.now() - startTime;
-      await supabaseClient.from("migration_logs").insert({
-        operation_id: operationId,
-        operation_type: "custom_sql",
-        sql_content: sql,
-        status: "success",
-        method_used: "edge-function",
-        execution_time_ms: executionTimeMs,
-        details: requestData.debug ? { debug: true } : null,
-        created_at: new Date().toISOString(),
-      });
-    } catch (logError) {
-      console.error("Failed to log SQL execution:", logError);
-    }
-
-    return new Response(JSON.stringify({ success: true, data }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({
+        success: true,
+        data: result,
+        details: {
+          executionTimeMs,
+        },
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      },
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: error.message || "Unknown error",
+        details: error,
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+      },
+    );
   }
 });

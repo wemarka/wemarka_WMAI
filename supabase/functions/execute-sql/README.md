@@ -1,55 +1,70 @@
 # Execute SQL Edge Function
 
-This edge function allows executing SQL statements directly in the Supabase database using the service role key.
+This edge function provides a secure way to execute SQL statements in your Supabase database.
 
 ## Features
 
-- Executes SQL statements using the `exec_sql` function
-- Creates the `exec_sql` function if it doesn't exist
-- Handles CORS for cross-origin requests
-- Provides detailed error messages
+- Executes SQL statements using the `exec_sql` RPC function
+- Handles errors gracefully
+- Logs operations to the `migration_logs` table
+- Provides detailed execution information
+- Implements proper CORS headers
 
 ## Usage
 
 ```javascript
-const response = await fetch(`${supabaseUrl}/functions/v1/execute-sql`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    apikey: supabaseKey,
-    Authorization: `Bearer ${supabaseKey}`,
+const { data, error } = await supabase.functions.invoke("execute-sql", {
+  body: { 
+    sql: "CREATE TABLE test (id serial primary key, name text)", 
+    operation_id: "create-test-table-123" // optional
   },
-  body: JSON.stringify({ sql: "SELECT * FROM your_table LIMIT 10" }),
 });
-
-const result = await response.json();
 ```
 
 ## Parameters
 
-The function accepts the following parameters in the request body:
+- `sql` (required): The SQL statement to execute
+- `operation_id` (optional): A unique identifier for the operation, used for logging
 
-- `sql` or `sql_text`: The SQL statement to execute
+## Response
 
-## CORS Support
-
-The function includes CORS headers to allow cross-origin requests:
-
+Successful response:
+```json
+{
+  "success": true,
+  "data": { ... },
+  "details": {
+    "executionTimeMs": 123
+  }
+}
 ```
-Access-Control-Allow-Origin: *
-Access-Control-Allow-Methods: POST, OPTIONS
-Access-Control-Allow-Headers: Content-Type, Authorization, authorization, x-client-info, apikey
+
+Error response:
+```json
+{
+  "success": false,
+  "error": "Error message",
+  "details": {
+    "executionTimeMs": 45,
+    "error": { ... }
+  }
+}
 ```
-
-## Error Handling
-
-The function returns detailed error messages in case of failure, including:
-
-- Authentication errors
-- Missing SQL statement
-- SQL execution errors
-- Function creation errors
 
 ## Security
 
-This function uses the service role key to execute SQL statements, which has full access to the database. It should be used with caution and only in secure environments.
+This function uses the service role key to execute SQL statements, so it should be used with caution. Make sure to validate and sanitize any user input before passing it to this function.
+
+## Deployment
+
+Deploy this function using the Supabase CLI:
+
+```bash
+supabase functions deploy execute-sql
+```
+
+Or use the provided script:
+
+```bash
+node scripts/deploy-edge-function.js execute-sql
+```

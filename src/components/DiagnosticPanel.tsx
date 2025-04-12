@@ -122,7 +122,29 @@ const DiagnosticPanel: React.FC = () => {
                   </div>
                   <div className="mt-1 text-blue-600 dark:text-blue-400 font-mono text-sm">
                     {summary.recommendedMethod}
+                    {summary.recommendedMethod === "dbUtils.executeSql" && (
+                      <span className="ml-2 px-1.5 py-0.5 text-xs bg-blue-100 dark:bg-blue-800 rounded-full">
+                        New
+                      </span>
+                    )}
                   </div>
+                  {summary.performanceStats && (
+                    <div className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                      <div className="flex items-center">
+                        <span className="font-medium mr-1">
+                          Avg. Execution Time:
+                        </span>
+                        {Math.round(summary.performanceStats.avgExecutionTime)}
+                        ms
+                      </div>
+                      {summary.performanceStats.reliability && (
+                        <div className="flex items-center mt-1">
+                          <span className="font-medium mr-1">Reliability:</span>
+                          {summary.performanceStats.reliability}%
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
@@ -494,7 +516,8 @@ const DiagnosticPanel: React.FC = () => {
             <div className="flex items-center">
               <Database className="w-4 h-4 mr-2" />
               SQL Execution
-              {diagnosticResults.directSqlExecution.pgQueryWorks ||
+              {diagnosticResults.directSqlExecution.dbUtilsWorks ||
+              diagnosticResults.directSqlExecution.pgQueryWorks ||
               diagnosticResults.directSqlExecution.execSqlWorks ||
               diagnosticResults.directSqlExecution.directRestWorks ? (
                 <CheckCircle className="w-4 h-4 ml-2 text-green-500" />
@@ -505,6 +528,112 @@ const DiagnosticPanel: React.FC = () => {
           </AccordionTrigger>
           <AccordionContent>
             <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium mb-1">
+                  dbUtils.executeSql Method:
+                </h4>
+                <div className="flex items-center justify-between">
+                  <span>Works:</span>
+                  {getStatusBadge(
+                    diagnosticResults.directSqlExecution.dbUtilsWorks,
+                  )}
+                </div>
+                {diagnosticResults.directSqlExecution.dbUtilsPerformance && (
+                  <div className="flex items-center justify-between mt-1">
+                    <span>Execution Time:</span>
+                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {Math.round(
+                        diagnosticResults.directSqlExecution.dbUtilsPerformance,
+                      )}
+                      ms
+                    </span>
+                  </div>
+                )}
+                {diagnosticResults.directSqlExecution.dbUtilsMethod && (
+                  <div className="flex items-center justify-between mt-1">
+                    <span>Method Used:</span>
+                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {diagnosticResults.directSqlExecution.dbUtilsMethod}
+                      {diagnosticResults.directSqlExecution.dbUtilsFallback && (
+                        <span className="ml-2 text-xs text-amber-600 dark:text-amber-400">
+                          (fallback)
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                )}
+                {diagnosticResults.directSqlExecution.dbUtilsRetries > 0 && (
+                  <div className="flex items-center justify-between mt-1">
+                    <span>Retry Attempts:</span>
+                    <span className="text-sm font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      {diagnosticResults.directSqlExecution.dbUtilsRetries}
+                    </span>
+                  </div>
+                )}
+                {diagnosticResults.directSqlExecution.dbUtilsError && (
+                  <div className="mt-2">
+                    <h4 className="text-xs font-medium">Error:</h4>
+                    <pre className="text-xs bg-red-50 dark:bg-red-900/20 p-2 rounded overflow-x-auto mt-1 text-red-800 dark:text-red-300">
+                      {JSON.stringify(
+                        diagnosticResults.directSqlExecution.dbUtilsError,
+                        null,
+                        2,
+                      )}
+                    </pre>
+                    {diagnosticResults.directSqlExecution.dbUtilsError
+                      .details && (
+                      <div className="mt-2">
+                        <h4 className="text-xs font-medium">Error Details:</h4>
+                        <div className="mt-1 space-y-2">
+                          {diagnosticResults.directSqlExecution.dbUtilsError
+                            .code && (
+                            <div className="flex items-start">
+                              <span className="text-xs font-medium w-20">
+                                Code:
+                              </span>
+                              <span className="text-xs font-mono bg-red-50 dark:bg-red-900/20 px-2 py-1 rounded">
+                                {
+                                  diagnosticResults.directSqlExecution
+                                    .dbUtilsError.code
+                                }
+                              </span>
+                            </div>
+                          )}
+                          {diagnosticResults.directSqlExecution.dbUtilsError
+                            .hint && (
+                            <div className="flex items-start">
+                              <span className="text-xs font-medium w-20">
+                                Hint:
+                              </span>
+                              <span className="text-xs bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded">
+                                {
+                                  diagnosticResults.directSqlExecution
+                                    .dbUtilsError.hint
+                                }
+                              </span>
+                            </div>
+                          )}
+                          {diagnosticResults.directSqlExecution.dbUtilsError
+                            .query && (
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium">
+                                Query:
+                              </span>
+                              <pre className="text-xs bg-gray-50 dark:bg-gray-800 p-2 rounded overflow-x-auto mt-1">
+                                {
+                                  diagnosticResults.directSqlExecution
+                                    .dbUtilsError.query
+                                }
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <h4 className="text-sm font-medium mb-1">pg_query Method:</h4>
                 <div className="flex items-center justify-between">

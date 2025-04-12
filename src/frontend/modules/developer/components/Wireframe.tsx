@@ -1,12 +1,37 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/frontend/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/frontend/components/ui/tabs';
-import { Button } from '@/frontend/components/ui/button';
-import { Input } from '@/frontend/components/ui/input';
-import { Textarea } from '@/frontend/components/ui/textarea';
-import { Badge } from '@/frontend/components/ui/badge';
-import { Separator } from '@/frontend/components/ui/separator';
-import { Code, GitBranch, GitCommit, GitPullRequest, Terminal, FileCode, Database, RefreshCw, Play, Save, Download, Upload } from 'lucide-react';
+import React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/frontend/components/ui/card";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/frontend/components/ui/tabs";
+import { Button } from "@/frontend/components/ui/button";
+import { Input } from "@/frontend/components/ui/input";
+import { Textarea } from "@/frontend/components/ui/textarea";
+import { Badge } from "@/frontend/components/ui/badge";
+import { Separator } from "@/frontend/components/ui/separator";
+import {
+  Code,
+  GitBranch,
+  GitCommit,
+  GitPullRequest,
+  Terminal,
+  FileCode,
+  Database,
+  RefreshCw,
+  Play,
+  Save,
+  Download,
+  Upload,
+} from "lucide-react";
 
 const DeveloperToolsWireframe = () => {
   return (
@@ -32,7 +57,7 @@ const DeveloperToolsWireframe = () => {
           <TabsTrigger value="version">Version Control</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="code" className="flex-1 flex flex-col">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
             {/* Code Editor */}
@@ -58,7 +83,7 @@ const DeveloperToolsWireframe = () => {
                 <CardContent className="flex-1 p-0 border rounded-md m-4 bg-muted/30">
                   <pre className="p-4 text-xs font-mono overflow-auto h-full">
                     <code className="text-foreground">
-{`import React, { useState, useEffect } from 'react';
+                      {`import React, { useState, useEffect } from 'react';
 import { fetchData } from './api';
 
 const DataComponent = () => {
@@ -101,7 +126,7 @@ export default DataComponent;`}
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Sidebar with file explorer and console */}
             <div className="lg:col-span-4 flex flex-col space-y-6">
               <Card>
@@ -145,20 +170,24 @@ export default DataComponent;`}
                   </div>
                 </CardFooter>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm">Console</CardTitle>
                 </CardHeader>
                 <CardContent className="bg-black text-green-400 p-3 rounded-md text-xs font-mono h-[200px] overflow-y-auto">
                   <div className="space-y-1">
-                    <p>> Starting development server...</p>
-                    <p>> Compiled successfully!</p>
-                    <p>> Server running at http://localhost:3000</p>
-                    <p className="text-yellow-400">> Warning: React version not specified in dependencies</p>
-                    <p>> GET /api/data 200 OK (124ms)</p>
-                    <p className="text-red-400">> Error: Cannot read property 'map' of undefined</p>
-                    <p>> at DataComponent.jsx:28:23</p>
+                    <p>{">"} Starting development server...</p>
+                    <p>{">"} Compiled successfully!</p>
+                    <p>{">"} Server running at http://localhost:3000</p>
+                    <p className="text-yellow-400">
+                      {">"} Warning: React version not specified in dependencies
+                    </p>
+                    <p>{">"} GET /api/data 200 OK (124ms)</p>
+                    <p className="text-red-400">
+                      {">"} Error: Cannot read property 'map' of undefined
+                    </p>
+                    <p>{">"} at DataComponent.jsx:28:23</p>
                   </div>
                 </CardContent>
                 <CardFooter className="border-t pt-2">
@@ -173,7 +202,7 @@ export default DataComponent;`}
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="api" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
             <div className="lg:col-span-8 flex flex-col space-y-6">
@@ -190,10 +219,13 @@ export default DataComponent;`}
                       <option>PUT</option>
                       <option>DELETE</option>
                     </select>
-                    <Input placeholder="https://api.example.com/endpoint" className="flex-1" />
+                    <Input
+                      placeholder="https://api.example.com/endpoint"
+                      className="flex-1"
+                    />
                     <Button>Send</Button>
                   </div>
-                  
+
                   <Tabs defaultValue="params">
                     <TabsList>
                       <TabsTrigger value="params">Params</TabsTrigger>
@@ -210,12 +242,15 @@ export default DataComponent;`}
                     <TabsContent value="headers" className="space-y-2 pt-2">
                       <div className="grid grid-cols-3 gap-2">
                         <Input placeholder="Key" defaultValue="Content-Type" />
-                        <Input placeholder="Value" defaultValue="application/json" />
+                        <Input
+                          placeholder="Value"
+                          defaultValue="application/json"
+                        />
                         <Button variant="outline">Add</Button>
                       </div>
                     </TabsContent>
                     <TabsContent value="body" className="pt-2">
-                      <Textarea 
+                      <Textarea
                         placeholder="Request body in JSON format"
                         className="min-h-[150px] font-mono text-sm"
                         defaultValue={`{
@@ -228,7 +263,7 @@ export default DataComponent;`}
                   </Tabs>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Response</CardTitle>
@@ -237,12 +272,14 @@ export default DataComponent;`}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Badge className="bg-green-500">200 OK</Badge>
-                      <span className="text-sm text-muted-foreground">124ms</span>
+                      <span className="text-sm text-muted-foreground">
+                        124ms
+                      </span>
                     </div>
                     <Separator />
                     <pre className="bg-muted p-4 rounded-md text-sm font-mono overflow-auto max-h-[300px]">
                       <code>
-{`{
+                        {`{
   "success": true,
   "data": {
     "id": 123,
@@ -258,7 +295,7 @@ export default DataComponent;`}
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className="lg:col-span-4">
               <Card className="h-full">
                 <CardHeader>
@@ -266,19 +303,31 @@ export default DataComponent;`}
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start text-sm">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-sm"
+                    >
                       <Badge className="mr-2 bg-green-500 h-2 w-2 p-0 rounded-full" />
                       GET /api/products
                     </Button>
-                    <Button variant="outline" className="w-full justify-start text-sm">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-sm"
+                    >
                       <Badge className="mr-2 bg-blue-500 h-2 w-2 p-0 rounded-full" />
                       POST /api/orders
                     </Button>
-                    <Button variant="outline" className="w-full justify-start text-sm">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-sm"
+                    >
                       <Badge className="mr-2 bg-yellow-500 h-2 w-2 p-0 rounded-full" />
                       PUT /api/users/123
                     </Button>
-                    <Button variant="outline" className="w-full justify-start text-sm">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-sm"
+                    >
                       <Badge className="mr-2 bg-red-500 h-2 w-2 p-0 rounded-full" />
                       DELETE /api/products/456
                     </Button>
@@ -294,7 +343,7 @@ export default DataComponent;`}
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="database" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
             <div className="lg:col-span-3">
@@ -326,7 +375,7 @@ export default DataComponent;`}
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className="lg:col-span-9 flex flex-col space-y-6">
               <Card>
                 <CardHeader>
@@ -339,13 +388,13 @@ export default DataComponent;`}
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <Textarea 
+                  <Textarea
                     className="font-mono text-sm min-h-[100px]"
                     defaultValue="SELECT * FROM users WHERE active = true ORDER BY created_at DESC LIMIT 10;"
                   />
                 </CardContent>
               </Card>
-              
+
               <Card className="flex-1">
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -362,21 +411,28 @@ export default DataComponent;`}
                           <th className="p-2 text-left font-medium">name</th>
                           <th className="p-2 text-left font-medium">email</th>
                           <th className="p-2 text-left font-medium">active</th>
-                          <th className="p-2 text-left font-medium">created_at</th>
+                          <th className="p-2 text-left font-medium">
+                            created_at
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {Array.from({length: 5}).map((_, i) => (
+                        {Array.from({ length: 5 }).map((_, i) => (
                           <tr key={i} className="border-b">
                             <td className="p-2">{i + 1}</td>
                             <td className="p-2">User {i + 1}</td>
                             <td className="p-2">user{i + 1}@example.com</td>
                             <td className="p-2">
-                              <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">
+                              <Badge
+                                variant="outline"
+                                className="bg-green-100 text-green-800 hover:bg-green-100"
+                              >
                                 true
                               </Badge>
                             </td>
-                            <td className="p-2 text-muted-foreground">2023-06-{15 - i}</td>
+                            <td className="p-2 text-muted-foreground">
+                              2023-06-{15 - i}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -387,7 +443,7 @@ export default DataComponent;`}
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="version" className="flex-1">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
             <div className="lg:col-span-8">
@@ -409,15 +465,20 @@ export default DataComponent;`}
                 </CardHeader>
                 <CardContent className="flex-1 overflow-auto">
                   <div className="space-y-4">
-                    {Array.from({length: 5}).map((_, i) => (
+                    {Array.from({ length: 5 }).map((_, i) => (
                       <div key={i} className="flex gap-3 pb-4 border-b">
                         <div className="mt-1">
                           <GitCommit className="h-5 w-5 text-blue-500" />
                         </div>
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <h3 className="font-medium">Update product listing component</h3>
-                            <Badge variant="outline" className="text-xs">{`#${1000 + i}`}</Badge>
+                            <h3 className="font-medium">
+                              Update product listing component
+                            </h3>
+                            <Badge
+                              variant="outline"
+                              className="text-xs"
+                            >{`#${1000 + i}`}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             Fixed pagination and improved mobile responsiveness
@@ -425,7 +486,7 @@ export default DataComponent;`}
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <span>Committed by John Doe</span>
                             <span>•</span>
-                            <span>{`${i + 1} day${i > 0 ? 's' : ''} ago`}</span>
+                            <span>{`${i + 1} day${i > 0 ? "s" : ""} ago`}</span>
                           </div>
                         </div>
                       </div>
@@ -434,7 +495,7 @@ export default DataComponent;`}
                 </CardContent>
               </Card>
             </div>
-            
+
             <div className="lg:col-span-4">
               <div className="space-y-6">
                 <Card>
@@ -462,22 +523,31 @@ export default DataComponent;`}
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Quick Actions</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <Button variant="outline" className="w-full justify-start text-sm">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-sm"
+                      >
                         <Code className="mr-2 h-4 w-4" />
                         Create new branch
                       </Button>
-                      <Button variant="outline" className="w-full justify-start text-sm">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-sm"
+                      >
                         <GitCommit className="mr-2 h-4 w-4" />
                         Commit changes
                       </Button>
-                      <Button variant="outline" className="w-full justify-start text-sm">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-sm"
+                      >
                         <GitPullRequest className="mr-2 h-4 w-4" />
                         Create pull request
                       </Button>
@@ -488,7 +558,7 @@ export default DataComponent;`}
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="logs" className="flex-1">
           <Card className="h-full flex flex-col">
             <CardHeader>
@@ -517,7 +587,7 @@ export default DataComponent;`}
                     <p className="text-xs opacity-70">2023-06-15 14:32:45</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">
                   <span className="font-bold">[WARN]</span>
                   <div>
@@ -525,7 +595,7 @@ export default DataComponent;`}
                     <p className="text-xs opacity-70">2023-06-15 14:30:12</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded">
                   <span className="font-bold">[INFO]</span>
                   <div>
@@ -533,7 +603,7 @@ export default DataComponent;`}
                     <p className="text-xs opacity-70">2023-06-15 14:28:33</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded">
                   <span className="font-bold">[INFO]</span>
                   <div>
@@ -541,15 +611,18 @@ export default DataComponent;`}
                     <p className="text-xs opacity-70">2023-06-15 14:27:55</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded bg-yellow-50 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300">
                   <span className="font-bold">[WARN]</span>
                   <div>
-                    <p>Slow query detected: SELECT * FROM orders WHERE created_at > '2023-01-01' (2.5s)</p>
+                    <p>
+                      Slow query detected: SELECT * FROM orders WHERE created_at{" "}
+                      {">"} '2023-01-01' (2.5s)
+                    </p>
                     <p className="text-xs opacity-70">2023-06-15 14:25:18</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded">
                   <span className="font-bold">[INFO]</span>
                   <div>
@@ -557,7 +630,7 @@ export default DataComponent;`}
                     <p className="text-xs opacity-70">2023-06-15 14:00:00</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-2 p-2 rounded bg-red-50 text-red-800 dark:bg-red-950 dark:text-red-300">
                   <span className="font-bold">[ERROR]</span>
                   <div>
@@ -573,7 +646,9 @@ export default DataComponent;`}
                   <Download className="mr-2 h-4 w-4" />
                   Export Logs
                 </Button>
-                <p className="text-sm text-muted-foreground">Showing 7 of 124 log entries</p>
+                <p className="text-sm text-muted-foreground">
+                  Showing 7 of 124 log entries
+                </p>
               </div>
             </CardFooter>
           </Card>

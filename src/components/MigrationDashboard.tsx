@@ -24,12 +24,14 @@ import {
   Languages,
   Search,
   Server,
+  Wrench,
 } from "lucide-react";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import MigrationRunner from "./MigrationRunner";
 import GitHubMigrationImporter from "./GitHubMigrationImporter";
 import GitHubMigrationLogs from "./GitHubMigrationLogs";
 import DiagnosticPanel from "./DiagnosticPanel";
+import MigrationSystemInitializer from "./MigrationSystemInitializer";
 import { Input } from "@/frontend/components/ui/input";
 
 const MigrationDashboard: React.FC = () => {
@@ -83,7 +85,7 @@ const MigrationDashboard: React.FC = () => {
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-4 lg:grid-cols-4 mb-8">
+            <TabsList className="grid grid-cols-5 lg:grid-cols-5 mb-8">
               <TabsTrigger value="runner" className="flex items-center">
                 <Code className="h-4 w-4 mr-2" />
                 {translations.runner}
@@ -99,6 +101,10 @@ const MigrationDashboard: React.FC = () => {
               <TabsTrigger value="diagnostics" className="flex items-center">
                 <Server className="h-4 w-4 mr-2" />
                 {translations.diagnostics}
+              </TabsTrigger>
+              <TabsTrigger value="setup" className="flex items-center">
+                <Wrench className="h-4 w-4 mr-2" />
+                {rtl ? "الإعداد" : "Setup"}
               </TabsTrigger>
             </TabsList>
 
@@ -116,6 +122,10 @@ const MigrationDashboard: React.FC = () => {
 
             <TabsContent value="diagnostics" className="mt-0">
               <DiagnosticPanel />
+            </TabsContent>
+
+            <TabsContent value="setup" className="mt-0">
+              <MigrationSystemInitializer />
             </TabsContent>
           </Tabs>
         </CardContent>
