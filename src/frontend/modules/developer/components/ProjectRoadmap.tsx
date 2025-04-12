@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -31,11 +31,27 @@ import {
   AlertTriangle,
   Zap,
   Download,
+  Lock,
+  ChevronRight,
+  ChevronLeft,
 } from "lucide-react";
+import { useToast } from "@/frontend/components/ui/use-toast";
 import {
   projectAnalysisService,
   Roadmap,
 } from "@/frontend/services/projectAnalysisService";
+
+// Extend the Phase interface to include status and progress
+interface Phase {
+  name: string;
+  description: string;
+  tasks: string[];
+  priority: string;
+  duration: string;
+  dependencies?: string[];
+  status?: string; // 'not-started', 'in-progress', 'completed'
+  progress?: number; // 0-100
+}
 import { useTranslation } from "react-i18next";
 import RoadmapVisualization from "./RoadmapVisualization";
 import RoadmapExportModal from "./RoadmapExportModal";
@@ -43,6 +59,7 @@ import RoadmapExportModal from "./RoadmapExportModal";
 export default function ProjectRoadmap() {
   const { t, i18n } = useTranslation();
   const { promptAIAssistant } = useAI();
+  const { toast } = useToast();
   const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -51,7 +68,12 @@ export default function ProjectRoadmap() {
   const [filterPriority, setFilterPriority] = useState<string | null>(null);
   const [showExportModal, setShowExportModal] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
   const isRTL = i18n.dir() === "rtl";
+
+  // Track previous completion state to detect changes
+  const prevPhaseCompleteRef = useRef<boolean>(false);
+  const autoNavigateEnabledRef = useRef<boolean>(true);
 
   const generateRoadmap = async () => {
     setLoading(true);
@@ -198,6 +220,111 @@ export default function ProjectRoadmap() {
     }
   };
 
+  // Check if the current phase is complete (for this demo, we'll consider a phase complete if it has a progress of 100%)
+  const isCurrentPhaseComplete = () => {
+    if (!roadmap || !roadmap.phases[currentPhaseIndex]) return false;
+
+    // For demo purposes, we'll randomly assign a progress value to each phase
+    // In a real implementation, this would come from actual progress tracking
+    const phase = roadmap.phases[currentPhaseIndex];
+
+    // Let's say a phase is considered complete if it has a "completed" status or a progress of 100%
+    // You would replace this with your actual completion logic
+    return phase.status === "completed" || phase.progress === 100;
+  };
+
+  const navigateToNextPhase = () => {
+    if (!roadmap) return;
+
+    if (!isCurrentPhaseComplete()) {
+      toast({
+        title: t("Phase not complete"),
+        description: t(
+          "You must complete the current phase before proceeding to the next one.",
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (currentPhaseIndex < roadmap.phases.length - 1) {
+      setCurrentPhaseIndex(currentPhaseIndex + 1);
+      toast({
+        title: t("Phase Navigation"),
+        description: t("Moving to next phase: {0}", {
+          0: roadmap.phases[currentPhaseIndex + 1].name,
+        }),
+      });
+    } else {
+      toast({
+        title: t("Roadmap Complete"),
+        description: t("You have completed all phases in the roadmap!"),
+      });
+    }
+  };
+
+  const navigateToPreviousPhase = () => {
+    if (!roadmap) return;
+
+    if (currentPhaseIndex > 0) {
+      setCurrentPhaseIndex(currentPhaseIndex - 1);
+      toast({
+        title: t("Phase Navigation"),
+        description: t("Moving to previous phase: {0}", {
+          0: roadmap.phases[currentPhaseIndex - 1].name,
+        }),
+      });
+    }
+  };
+
+  // Toggle auto-navigation feature
+  const toggleAutoNavigation = () => {
+    autoNavigateEnabledRef.current = !autoNavigateEnabledRef.current;
+    toast({
+      title: autoNavigateEnabledRef.current
+        ? t("Auto-Navigation Enabled")
+        : t("Auto-Navigation Disabled"),
+      description: autoNavigateEnabledRef.current
+        ? t(
+            "You will automatically proceed to the next phase when the current one is completed.",
+          )
+        : t("You will need to manually proceed to the next phase."),
+    });
+  };
+
+  // Effect to detect phase completion and auto-navigate
+  useEffect(() => {
+    const isComplete = isCurrentPhaseComplete();
+
+    // If phase just became complete and wasn't complete before
+    if (
+      isComplete &&
+      !prevPhaseCompleteRef.current &&
+      autoNavigateEnabledRef.current
+    ) {
+      // Small delay to allow user to see the completion state before navigating
+      const timer = setTimeout(() => {
+        if (currentPhaseIndex < (roadmap?.phases.length || 0) - 1) {
+          toast({
+            title: t("Phase Complete"),
+            description: t("Automatically proceeding to next phase..."),
+          });
+          setCurrentPhaseIndex(currentPhaseIndex + 1);
+        } else if (currentPhaseIndex === (roadmap?.phases.length || 0) - 1) {
+          toast({
+            title: t("Roadmap Complete"),
+            description: t("You have completed all phases in the roadmap!"),
+          });
+        }
+      }, 1500); // 1.5 second delay
+
+      return () => clearTimeout(timer);
+    }
+
+    // Update the ref with current completion state
+    prevPhaseCompleteRef.current = isComplete;
+  }, [isCurrentPhaseComplete(), currentPhaseIndex, roadmap]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -262,57 +389,122 @@ export default function ProjectRoadmap() {
       </div>
 
       {roadmap && (
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <span>{t("Filter by priority")}:</span>
-            <div className="flex">
+        <>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <span>{t("Filter by priority")}:</span>
+              <div className="flex">
+                <Button
+                  variant={filterPriority === null ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterPriority(null)}
+                  className="rounded-r-none px-3"
+                >
+                  {t("All")}
+                </Button>
+                <Button
+                  variant={filterPriority === "high" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterPriority("high")}
+                  className="rounded-none px-3 border-x-0"
+                >
+                  {t("High")}
+                </Button>
+                <Button
+                  variant={filterPriority === "medium" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterPriority("medium")}
+                  className="rounded-none px-3 border-x-0"
+                >
+                  {t("Medium")}
+                </Button>
+                <Button
+                  variant={filterPriority === "low" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterPriority("low")}
+                  className="rounded-l-none px-3"
+                >
+                  {t("Low")}
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
               <Button
-                variant={filterPriority === null ? "default" : "outline"}
+                variant="outline"
                 size="sm"
-                onClick={() => setFilterPriority(null)}
-                className="rounded-r-none px-3"
+                onClick={toggleAutoNavigation}
               >
-                {t("All")}
+                <Check className="h-4 w-4 mr-2" />
+                {autoNavigateEnabledRef.current
+                  ? t("Auto-Navigate: On")
+                  : t("Auto-Navigate: Off")}
               </Button>
               <Button
-                variant={filterPriority === "high" ? "default" : "outline"}
+                variant="ghost"
                 size="sm"
-                onClick={() => setFilterPriority("high")}
-                className="rounded-none px-3 border-x-0"
+                onClick={() =>
+                  promptAIAssistant(
+                    "Analyze our current development roadmap and suggest optimizations.",
+                  )
+                }
               >
-                {t("High")}
-              </Button>
-              <Button
-                variant={filterPriority === "medium" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterPriority("medium")}
-                className="rounded-none px-3 border-x-0"
-              >
-                {t("Medium")}
-              </Button>
-              <Button
-                variant={filterPriority === "low" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setFilterPriority("low")}
-                className="rounded-l-none px-3"
-              >
-                {t("Low")}
+                <Zap className="h-4 w-4 mr-2" />
+                {t("AI Analysis")}
               </Button>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() =>
-              promptAIAssistant(
-                "Analyze our current development roadmap and suggest optimizations.",
-              )
-            }
-          >
-            <Zap className="h-4 w-4 mr-2" />
-            {t("AI Analysis")}
-          </Button>
-        </div>
+
+          {/* Phase Navigation Controls */}
+          <div className="flex justify-between items-center mt-4 bg-muted p-3 rounded-md">
+            <Button
+              variant="outline"
+              onClick={navigateToPreviousPhase}
+              disabled={!roadmap || currentPhaseIndex === 0}
+              className="flex items-center"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              {t("Previous Phase")}
+            </Button>
+
+            <div className="flex items-center">
+              <span className="font-medium">
+                {t("Phase")} {currentPhaseIndex + 1} {t("of")}{" "}
+                {roadmap.phases.length}
+              </span>
+              {roadmap.phases[currentPhaseIndex] && (
+                <Badge className="ml-2" variant="outline">
+                  {roadmap.phases[currentPhaseIndex].name}
+                </Badge>
+              )}
+              {!isCurrentPhaseComplete() && (
+                <div className="flex items-center ml-3 text-amber-600 dark:text-amber-400">
+                  <Lock className="h-4 w-4 mr-1" />
+                  <span className="text-xs">
+                    {t("Complete this phase to proceed")}
+                  </span>
+                </div>
+              )}
+              {isCurrentPhaseComplete() && (
+                <div className="flex items-center ml-3 text-green-600 dark:text-green-400">
+                  <Check className="h-4 w-4 mr-1" />
+                  <span className="text-xs">{t("Phase complete")}</span>
+                </div>
+              )}
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={navigateToNextPhase}
+              disabled={
+                !roadmap || currentPhaseIndex >= roadmap.phases.length - 1
+              }
+              className="flex items-center"
+            >
+              {t("Next Phase")}
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </>
       )}
 
       {savedId && (
@@ -350,6 +542,8 @@ export default function ProjectRoadmap() {
                 filterPriority={filterPriority}
                 onAIAssist={handleAIAssist}
                 isRTL={isRTL}
+                currentPhaseIndex={currentPhaseIndex}
+                isCurrentPhaseComplete={isCurrentPhaseComplete()}
               />
             </CardContent>
             <CardFooter>

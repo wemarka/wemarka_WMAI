@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useToast } from "@/frontend/components/ui/use-toast";
-import { Button } from "@/frontend/components/ui/button";
+import { Button } from "../frontend/components/ui/button";
+import { Input } from "../frontend/components/ui/input";
 import {
   Card,
   CardContent,
@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/frontend/components/ui/card";
+} from "../frontend/components/ui/card";
 import {
   Table,
   TableBody,
@@ -16,14 +16,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/frontend/components/ui/table";
+} from "../frontend/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/frontend/components/ui/select";
+} from "../frontend/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -31,9 +31,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/frontend/components/ui/dialog";
-import { Input } from "@/frontend/components/ui/input";
-import { Badge } from "@/frontend/components/ui/badge";
+} from "../frontend/components/ui/dialog";
+import { Badge } from "../frontend/components/ui/badge";
 import {
   Loader2,
   RefreshCw,
@@ -50,7 +49,6 @@ import {
   Server,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { useLanguage } from "@/frontend/contexts/LanguageContext";
 
 interface DiagnosticLog {
   id: number;
@@ -70,9 +68,6 @@ interface DiagnosticLogsViewerProps {
 const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
   searchQuery: externalSearchQuery,
 }) => {
-  const { toast } = useToast();
-  const { direction } = useLanguage();
-  const rtl = direction === "rtl";
   const [logs, setLogs] = useState<DiagnosticLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<DiagnosticLog[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -112,29 +107,12 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
 
       if (fetchError) {
         setError(`Error fetching diagnostic logs: ${fetchError.message}`);
-        toast({
-          title: rtl ? "فشل تحميل السجلات" : "Failed to load logs",
-          description: fetchError.message,
-          variant: "destructive",
-        });
       } else {
         setLogs(data || []);
         setFilteredLogs(data || []);
-        toast({
-          title: rtl ? "تم تحميل السجلات بنجاح" : "Logs loaded successfully",
-          description: rtl
-            ? `تم تحميل ${data?.length || 0} سجل`
-            : `Loaded ${data?.length || 0} logs`,
-          variant: "success",
-        });
       }
     } catch (err: any) {
       setError(`Error: ${err.message}`);
-      toast({
-        title: rtl ? "خطأ" : "Error",
-        description: `${err.message}`,
-        variant: "destructive",
-      });
     } finally {
       setIsLoading(false);
     }
@@ -208,7 +186,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
             variant="outline"
             className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
           >
-            {rtl ? "ناجح" : "Success"}
+            Success
           </Badge>
         );
       case "failed":
@@ -217,7 +195,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
             variant="outline"
             className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
           >
-            {rtl ? "فشل" : "Failed"}
+            Failed
           </Badge>
         );
       case "error":
@@ -226,7 +204,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
             variant="outline"
             className="bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800"
           >
-            {rtl ? "خطأ" : "Error"}
+            Error
           </Badge>
         );
       default:
@@ -280,11 +258,9 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center">
           <Server className="mr-2 h-5 w-5" />
-          {rtl ? "سجلات التشخيص" : "Diagnostic Logs"}
+          Diagnostic Logs
         </CardTitle>
-        <CardDescription>
-          {rtl ? "عرض سجلات تشخيص النظام" : "View system diagnostic logs"}
-        </CardDescription>
+        <CardDescription>View system diagnostic logs</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -292,7 +268,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder={rtl ? "بحث في السجلات..." : "Search logs..."}
+              placeholder="Search logs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -304,19 +280,19 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
               onValueChange={(value) => setSortOrder(value as "asc" | "desc")}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={rtl ? "ترتيب حسب" : "Sort by"} />
+                <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="desc">
                   <div className="flex items-center">
                     <ChevronDown className="mr-2 h-4 w-4" />
-                    {rtl ? "الأحدث أولاً" : "Newest first"}
+                    Newest first
                   </div>
                 </SelectItem>
                 <SelectItem value="asc">
                   <div className="flex items-center">
                     <ChevronUp className="mr-2 h-4 w-4" />
-                    {rtl ? "الأقدم أولاً" : "Oldest first"}
+                    Oldest first
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -340,32 +316,22 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
         <div className="flex flex-col sm:flex-row justify-between gap-4">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue
-                placeholder={rtl ? "تصفية حسب الحالة" : "Filter by status"}
-              />
+              <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {rtl ? "جميع الحالات" : "All statuses"}
-              </SelectItem>
-              <SelectItem value="success">
-                {rtl ? "ناجح" : "Success"}
-              </SelectItem>
-              <SelectItem value="failed">{rtl ? "فشل" : "Failed"}</SelectItem>
-              <SelectItem value="error">{rtl ? "خطأ" : "Error"}</SelectItem>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="success">Success</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="error">Error</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue
-                placeholder={rtl ? "تصفية حسب النوع" : "Filter by type"}
-              />
+              <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">
-                {rtl ? "جميع الأنواع" : "All types"}
-              </SelectItem>
+              <SelectItem value="all">All types</SelectItem>
               {operationTypes
                 .filter((type) => type !== "all")
                 .map((type) => (
@@ -390,15 +356,11 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{rtl ? "التاريخ" : "Date"}</TableHead>
-                <TableHead>{rtl ? "نوع العملية" : "Operation Type"}</TableHead>
-                <TableHead>{rtl ? "الحالة" : "Status"}</TableHead>
-                <TableHead>
-                  {rtl ? "الوقت (مللي ثانية)" : "Time (ms)"}
-                </TableHead>
-                <TableHead className="text-right">
-                  {rtl ? "الإجراءات" : "Actions"}
-                </TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Operation Type</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Time (ms)</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -408,7 +370,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                     <div className="flex flex-col items-center justify-center">
                       <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
                       <span className="text-muted-foreground">
-                        {rtl ? "جاري تحميل السجلات..." : "Loading logs..."}
+                        Loading logs...
                       </span>
                     </div>
                   </TableCell>
@@ -419,12 +381,10 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                     <div className="flex flex-col items-center justify-center">
                       <FileText className="h-8 w-8 text-muted-foreground mb-2" />
                       <span className="text-muted-foreground">
-                        {rtl ? "لا توجد سجلات" : "No logs found"}
+                        No logs found
                       </span>
                       <span className="text-sm text-muted-foreground mt-1">
-                        {rtl
-                          ? "قم بتشغيل بعض عمليات التشخيص أو تغيير معايير التصفية"
-                          : "Run some diagnostics or change your filter criteria"}
+                        Run some diagnostics or change your filter criteria
                       </span>
                     </div>
                   </TableCell>
@@ -461,19 +421,16 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                         </DialogTrigger>
                         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>
-                              {rtl ? "تفاصيل السجل" : "Log Details"}
-                            </DialogTitle>
+                            <DialogTitle>Log Details</DialogTitle>
                             <DialogDescription>
-                              {rtl ? "معرف العملية:" : "Operation ID:"}{" "}
-                              {log.operation_id}
+                              Operation ID: {log.operation_id}
                             </DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4 mt-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
                                 <h4 className="text-sm font-medium mb-1">
-                                  {rtl ? "نوع العملية" : "Operation Type"}
+                                  Operation Type
                                 </h4>
                                 <div>
                                   {getOperationTypeBadge(log.operation_type)}
@@ -481,13 +438,13 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                               </div>
                               <div>
                                 <h4 className="text-sm font-medium mb-1">
-                                  {rtl ? "الحالة" : "Status"}
+                                  Status
                                 </h4>
                                 <div>{getStatusBadge(log.status)}</div>
                               </div>
                               <div>
                                 <h4 className="text-sm font-medium mb-1">
-                                  {rtl ? "الطريقة المستخدمة" : "Method Used"}
+                                  Method Used
                                 </h4>
                                 <div>
                                   <Badge variant="outline">
@@ -497,7 +454,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                               </div>
                               <div>
                                 <h4 className="text-sm font-medium mb-1">
-                                  {rtl ? "وقت التنفيذ" : "Execution Time"}
+                                  Execution Time
                                 </h4>
                                 <div className="flex items-center">
                                   <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
@@ -511,7 +468,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
                             {log.details && (
                               <div>
                                 <h4 className="text-sm font-medium mb-1">
-                                  {rtl ? "التفاصيل" : "Details"}
+                                  Details
                                 </h4>
                                 <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-x-auto text-xs font-mono">
                                   {JSON.stringify(log.details, null, 2)}
@@ -530,15 +487,13 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
         </div>
 
         <div className="text-sm text-muted-foreground">
-          {rtl
-            ? `عرض ${filteredLogs.length} من أصل ${logs.length} سجل`
-            : `Showing ${filteredLogs.length} of ${logs.length} logs`}
+          Showing {filteredLogs.length} of {logs.length} logs
         </div>
       </CardContent>
 
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={() => window.history.back()}>
-          {rtl ? "رجوع" : "Back"}
+          Back
         </Button>
         <Button
           variant="outline"
@@ -555,7 +510,7 @@ const DiagnosticLogsViewer: React.FC<DiagnosticLogsViewerProps> = ({
             sortOrder === "desc"
           }
         >
-          {rtl ? "إعادة تعيين الفلاتر" : "Reset Filters"}
+          Reset Filters
         </Button>
       </CardFooter>
     </Card>

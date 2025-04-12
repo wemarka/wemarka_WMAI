@@ -31,7 +31,9 @@ export function useAutoSave<T>({
     error: "Failed to save changes",
   },
 }: AutoSaveOptions) {
+  // Use the useToast hook to get the toast function
   const { toast } = useToast();
+
   const [data, setData] = useState<T>(() => {
     // Try to load from localStorage first
     if (typeof window !== "undefined" && saveToLocalStorage) {
@@ -119,8 +121,8 @@ export function useAutoSave<T>({
     onSave,
     saveToLocalStorage,
     showToast,
-    toast,
     toastMessages,
+    toast,
   ]);
 
   // Clear saved data

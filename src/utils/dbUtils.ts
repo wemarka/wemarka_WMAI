@@ -60,6 +60,7 @@ export async function executeSql(
         // Try using the execute_sql RPC function
         const { data, error } = await Promise.race([
           supabase.rpc("execute_sql", { query_text: query }),
+          supabase.rpc("execute_sql", { sql_text: query }),
           new Promise((_, reject) =>
             setTimeout(
               () =>
@@ -88,22 +89,21 @@ export async function executeSql(
           };
 
           // If execute_sql fails, try using pg_query as a fallback
-          // Try multiple parameter names for pg_query
-          const { data: pgData, error: pgError } = await Promise.race([
-            supabase.rpc("pg_query", { sql: query }),
-            supabase.rpc("pg_query", { query: query }),
-            // Also try with query_text parameter for backward compatibility
-            supabase.rpc("pg_query", { query_text: query }),
-            new Promise((_, reject) =>
-              setTimeout(
-                () =>
-                  reject(
-                    new Error("Timeout: pg_query RPC call exceeded time limit"),
-                  ),
-                timeout,
-              ),
-            ),
-          ]);
+          // Use only the correct parameter name for pg_query
+          let pgData = null;
+          let pgError = null;
+
+          try {
+            // Always use the sql parameter for pg_query
+            const result = await supabase.rpc("pg_query", { sql: query });
+            if (!result.error) {
+              pgData = result.data;
+            } else {
+              pgError = result.error;
+            }
+          } catch (err) {
+            pgError = err;
+          }
 
           if (pgError) {
             console.error(
@@ -242,7 +242,7 @@ export async function testDatabaseConnection() {
     let pgQueryData = null;
 
     try {
-      // Try multiple parameter names for pg_query test
+      // Always use the sql parameter for pg_query
       let data, error;
       try {
         const result = await supabase.rpc("pg_query", {
@@ -251,15 +251,7 @@ export async function testDatabaseConnection() {
         data = result.data;
         error = result.error;
       } catch (err) {
-        try {
-          const result = await supabase.rpc("pg_query", {
-            query: "SELECT 1 as pg_query_test",
-          });
-          data = result.data;
-          error = result.error;
-        } catch (innerErr) {
-          error = innerErr;
-        }
+        error = err;
       }
       pgQueryAvailable = !error;
       pgQueryError = error;

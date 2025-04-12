@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "deploy": "supabase functions deploy monitoring-alerts"
+  },
+  "importMap": "../import_map.json"
+}

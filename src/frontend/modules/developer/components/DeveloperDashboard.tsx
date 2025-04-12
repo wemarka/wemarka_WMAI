@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
+import { useAI } from "@/frontend/contexts/AIContext";
 
 interface DeveloperDashboardProps {
   isRTL?: boolean;
@@ -32,7 +33,15 @@ interface DeveloperDashboardProps {
 
 const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
   const { direction } = useLanguage();
+  const { promptAIAssistant } = useAI();
   const effectiveRTL = isRTL || direction === "rtl";
+
+  const handleAIAnalysis = useCallback(() => {
+    const prompt = effectiveRTL
+      ? "قم بتحليل المشروع بالكامل من بدايته إلى الآن، وتلخيص ما تم إنجازه، وما تبقى للتطوير بشكل كامل، مع تقديم اقتراحاتك للمراحل التالية."
+      : "Analyze the entire project from its inception to now, summarize what has been accomplished, what remains to be developed, and provide suggestions for future phases.";
+    promptAIAssistant(prompt);
+  }, [effectiveRTL, promptAIAssistant]);
 
   return (
     <ModuleLayout moduleName={effectiveRTL ? "المطور" : "Developer"}>
@@ -266,6 +275,34 @@ const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
                 <Link to="/dashboard/developer/development-roadmap">
                   {isRTL ? "خارطة التطوير" : "Development Roadmap"}
                 </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 gap-2 mb-2">
+              <Button
+                onClick={handleAIAnalysis}
+                variant="outline"
+                className="w-full bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900 dark:border-blue-800 dark:text-blue-300"
+              >
+                {isRTL
+                  ? "تحليل شامل بالذكاء الاصطناعي"
+                  : "AI Comprehensive Analysis"}
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 gap-2 mb-2">
+              <Button
+                onClick={() => {
+                  const { promptAIAssistant } = useAI();
+                  const prompt = isRTL
+                    ? "قم بتحليل المشروع بالكامل من بدايته إلى الآن، وتلخيص ما تم إنجازه، وما تبقى للتطوير بشكل كامل، مع تقديم اقتراحاتك للمراحل التالية."
+                    : "Analyze the entire project from its inception to now, summarize what has been accomplished, what remains to be developed, and provide suggestions for future phases.";
+                  promptAIAssistant(prompt);
+                }}
+                variant="outline"
+                className="w-full bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900 dark:border-blue-800 dark:text-blue-300"
+              >
+                {isRTL
+                  ? "تحليل شامل بالذكاء الاصطناعي"
+                  : "AI Comprehensive Analysis"}
               </Button>
             </div>
             <Button asChild className="w-full">

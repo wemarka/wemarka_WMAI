@@ -1,0 +1,9 @@
+import UnifiedOperationalMonitoringCenter from "@/components/UnifiedOperationalMonitoringCenter";
+
+export default function UnifiedOperationalMonitoringCenterWithAlerts() {
+  return (
+    <div className="bg-white">
+      <UnifiedOperationalMonitoringCenter defaultTab="alerts" />
+    </div>
+  );
+}

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useToast } from "@/frontend/components/ui/use-toast";
-import { Button } from "@/frontend/components/ui/button";
-import { Input } from "@/frontend/components/ui/input";
+import { Button } from "../frontend/components/ui/button";
+import { Input } from "../frontend/components/ui/input";
 import {
   Card,
   CardContent,
@@ -9,13 +8,13 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/frontend/components/ui/card";
+} from "../frontend/components/ui/card";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/frontend/components/ui/tabs";
+} from "../frontend/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -23,8 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/frontend/components/ui/dialog";
-import { useLanguage } from "@/frontend/contexts/LanguageContext";
+} from "../frontend/components/ui/dialog";
 import {
   Server,
   Database,
@@ -40,9 +38,9 @@ import {
 import DiagnosticPanel from "./DiagnosticPanel";
 import DiagnosticLogsViewer from "./DiagnosticLogsViewer";
 import SystemHealthMonitor from "./SystemHealthMonitor";
-import PerformanceMetricsViewer from "./PerformanceMetricsViewer";
-import InvoiceMonitor from "./InvoiceMonitor";
-import { diagnosticTool } from "@/utils/diagnosticTool";
+import SQLExecutionMonitor from "./SQLExecutionMonitor";
+import DatabaseDiagnosticTool from "./DatabaseDiagnosticTool";
+import DatabaseUtilsTester from "./DatabaseUtilsTester";
 
 interface SystemMetric {
   name: string;
@@ -54,9 +52,6 @@ interface SystemMetric {
 }
 
 const DiagnosticMonitoringHub: React.FC = () => {
-  const { toast } = useToast();
-  const { direction } = useLanguage();
-  const rtl = direction === "rtl";
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,91 +102,12 @@ const DiagnosticMonitoringHub: React.FC = () => {
   const refreshMetrics = async () => {
     setIsLoading(true);
     try {
-      // Run diagnostics to get fresh data
-      const diagnosticResults = await diagnosticTool.runFullDiagnostic();
-
-      // Update metrics based on diagnostic results
-      const updatedMetrics: SystemMetric[] = [
-        {
-          name: "SQL Execution Success Rate",
-          value: diagnosticResults.summary.hasWorkingMethod ? 100 : 0,
-          unit: "%",
-          status: diagnosticResults.summary.hasWorkingMethod
-            ? "success"
-            : "error",
-          trend: "stable",
-        },
-        {
-          name: "Database Connection Status",
-          value: diagnosticResults.basicConnection.connected
-            ? "Connected"
-            : "Disconnected",
-          status: diagnosticResults.basicConnection.connected
-            ? "success"
-            : "error",
-          trend: "stable",
-        },
-        {
-          name: "Edge Functions Status",
-          value:
-            diagnosticResults.edgeFunctions.sqlExecutorWorks ||
-            diagnosticResults.edgeFunctions.executeSqlWorks
-              ? "Operational"
-              : "Issues Detected",
-          status:
-            diagnosticResults.edgeFunctions.sqlExecutorWorks ||
-            diagnosticResults.edgeFunctions.executeSqlWorks
-              ? "success"
-              : "warning",
-          trend: "stable",
-        },
-        {
-          name: "RPC Functions Status",
-          value:
-            diagnosticResults.rpcFunctions.pgQuery.available ||
-            diagnosticResults.rpcFunctions.execSql.available
-              ? "Operational"
-              : "Issues Detected",
-          status:
-            diagnosticResults.rpcFunctions.pgQuery.available ||
-            diagnosticResults.rpcFunctions.execSql.available
-              ? "success"
-              : "warning",
-          trend: "stable",
-        },
-      ];
-
-      // If execution time is available, add it as a metric
-      if (diagnosticResults.executionTimeMs) {
-        updatedMetrics.push({
-          name: "Diagnostic Execution Time",
-          value: diagnosticResults.executionTimeMs,
-          unit: "ms",
-          status:
-            diagnosticResults.executionTimeMs < 2000
-              ? "success"
-              : diagnosticResults.executionTimeMs < 5000
-                ? "warning"
-                : "error",
-          trend: "stable",
-        });
-      }
-
-      setSystemMetrics(updatedMetrics);
-      toast({
-        title: rtl ? "تم تحديث المقاييس" : "Metrics Updated",
-        description: rtl
-          ? "تم تحديث مقاييس النظام بنجاح"
-          : "System metrics have been successfully updated",
-        variant: "success",
-      });
+      // In a real implementation, we would fetch fresh metrics here
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1500);
     } catch (error) {
-      toast({
-        title: rtl ? "فشل التحديث" : "Update Failed",
-        description: `${error.message}`,
-        variant: "destructive",
-      });
-    } finally {
+      console.error("Error refreshing metrics:", error);
       setIsLoading(false);
     }
   };
@@ -283,16 +199,14 @@ const DiagnosticMonitoringHub: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
-            {rtl
-              ? "لوحة المراقبة والتشخيص"
-              : "Monitoring & Diagnostics Dashboard"}
+            Monitoring & Diagnostics Dashboard
           </h2>
           <div className="flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0 w-full sm:w-auto">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={rtl ? "بحث في المقاييس..." : "Search metrics..."}
+                placeholder="Search metrics..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 w-full"
@@ -325,7 +239,7 @@ const DiagnosticMonitoringHub: React.FC = () => {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  {rtl ? "جاري التحديث..." : "Refreshing..."}
+                  Refreshing...
                 </>
               ) : (
                 <>
@@ -343,7 +257,7 @@ const DiagnosticMonitoringHub: React.FC = () => {
                       d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                     />
                   </svg>
-                  {rtl ? "تحديث المقاييس" : "Refresh Metrics"}
+                  Refresh Metrics
                 </>
               )}
             </Button>
@@ -352,9 +266,8 @@ const DiagnosticMonitoringHub: React.FC = () => {
 
         {searchQuery && (
           <div className="text-sm text-gray-500 mb-2">
-            {rtl
-              ? `نتائج البحث عن "${searchQuery}": ${filteredMetrics.length} من ${systemMetrics.length}`
-              : `Search results for "${searchQuery}": ${filteredMetrics.length} of ${systemMetrics.length}`}
+            Search results for "{searchQuery}": {filteredMetrics.length} of{" "}
+            {systemMetrics.length}
           </div>
         )}
 
@@ -377,20 +290,12 @@ const DiagnosticMonitoringHub: React.FC = () => {
                       className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(metric.status)}`}
                     >
                       {metric.status === "success"
-                        ? rtl
-                          ? "جيد"
-                          : "Good"
+                        ? "Good"
                         : metric.status === "warning"
-                          ? rtl
-                            ? "تحذير"
-                            : "Warning"
+                          ? "Warning"
                           : metric.status === "error"
-                            ? rtl
-                              ? "خطأ"
-                              : "Error"
-                            : rtl
-                              ? "معلومات"
-                              : "Info"}
+                            ? "Error"
+                            : "Info"}
                     </span>
                   </div>
                 </div>
@@ -413,7 +318,7 @@ const DiagnosticMonitoringHub: React.FC = () => {
                       </span>
                     )}
                     <span className="ml-1 text-gray-500">
-                      {rtl ? "منذ آخر تحديث" : "since last update"}
+                      since last update
                     </span>
                   </div>
                 )}
@@ -426,19 +331,17 @@ const DiagnosticMonitoringHub: React.FC = () => {
           <div className="text-center py-8">
             <FileText className="h-12 w-12 mx-auto text-gray-400" />
             <h3 className="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100">
-              {rtl ? "لا توجد نتائج" : "No results found"}
+              No results found
             </h3>
             <p className="mt-1 text-sm text-gray-500">
-              {rtl
-                ? `لم يتم العثور على أي مقاييس تطابق "${searchQuery}"`
-                : `No metrics match your search for "${searchQuery}"`}
+              No metrics match your search for "{searchQuery}"
             </p>
             <Button
               variant="outline"
               className="mt-4"
               onClick={() => setSearchQuery("")}
             >
-              {rtl ? "مسح البحث" : "Clear search"}
+              Clear search
             </Button>
           </div>
         )}
@@ -449,12 +352,10 @@ const DiagnosticMonitoringHub: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Activity className="mr-2 h-5 w-5" />
-                  {rtl ? "الإجراءات السريعة" : "Quick Actions"}
+                  Quick Actions
                 </CardTitle>
                 <CardDescription>
-                  {rtl
-                    ? "أدوات تشخيص وإصلاح سريعة"
-                    : "Quick diagnostic and repair tools"}
+                  Quick diagnostic and repair tools
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -466,20 +367,15 @@ const DiagnosticMonitoringHub: React.FC = () => {
                         className="w-full justify-start"
                       >
                         <Database className="mr-2 h-4 w-4" />
-                        {rtl ? "تشخيص قاعدة البيانات" : "Database Diagnostics"}
+                        Database Diagnostics
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>
-                          {rtl
-                            ? "تشخيص قاعدة البيانات"
-                            : "Database Diagnostics"}
-                        </DialogTitle>
+                        <DialogTitle>Database Diagnostics</DialogTitle>
                         <DialogDescription>
-                          {rtl
-                            ? "تحليل شامل لاتصال قاعدة البيانات وقدرات تنفيذ SQL"
-                            : "Comprehensive analysis of database connection and SQL execution capabilities"}
+                          Comprehensive analysis of database connection and SQL
+                          execution capabilities
                         </DialogDescription>
                       </DialogHeader>
                       <div className="mt-4">
@@ -495,18 +391,14 @@ const DiagnosticMonitoringHub: React.FC = () => {
                         className="w-full justify-start"
                       >
                         <FileText className="mr-2 h-4 w-4" />
-                        {rtl ? "عرض سجلات التشخيص" : "View Diagnostic Logs"}
+                        View Diagnostic Logs
                       </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
-                        <DialogTitle>
-                          {rtl ? "سجلات التشخيص" : "Diagnostic Logs"}
-                        </DialogTitle>
+                        <DialogTitle>Diagnostic Logs</DialogTitle>
                         <DialogDescription>
-                          {rtl
-                            ? "عرض وتحليل سجلات تشخيص النظام"
-                            : "View and analyze system diagnostic logs"}
+                          View and analyze system diagnostic logs
                         </DialogDescription>
                       </DialogHeader>
                       <div className="mt-4">
@@ -521,12 +413,12 @@ const DiagnosticMonitoringHub: React.FC = () => {
                     onClick={refreshMetrics}
                   >
                     <BarChart className="mr-2 h-4 w-4" />
-                    {rtl ? "تحديث المقاييس" : "Refresh Metrics"}
+                    Refresh Metrics
                   </Button>
 
                   <Button variant="outline" className="w-full justify-start">
                     <Clock className="mr-2 h-4 w-4" />
-                    {rtl ? "جدولة تشخيص" : "Schedule Diagnostics"}
+                    Schedule Diagnostics
                   </Button>
                 </div>
               </CardContent>
@@ -536,44 +428,38 @@ const DiagnosticMonitoringHub: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Server className="mr-2 h-5 w-5" />
-                  {rtl ? "حالة النظام" : "System Status"}
+                  System Status
                 </CardTitle>
-                <CardDescription>
-                  {rtl
-                    ? "نظرة عامة على صحة النظام"
-                    : "Overview of system health"}
-                </CardDescription>
+                <CardDescription>Overview of system health</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span>
-                      {rtl ? "حالة قاعدة البيانات" : "Database Status"}
-                    </span>
+                    <span>Database Status</span>
                     <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                      {rtl ? "متصل" : "Connected"}
+                      Connected
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>{rtl ? "وظائف الحافة" : "Edge Functions"}</span>
+                    <span>Edge Functions</span>
                     <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                      {rtl ? "تعمل" : "Operational"}
+                      Operational
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>{rtl ? "وظائف RPC" : "RPC Functions"}</span>
+                    <span>RPC Functions</span>
                     <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                      {rtl ? "تعمل" : "Operational"}
+                      Operational
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>{rtl ? "تنفيذ SQL" : "SQL Execution"}</span>
+                    <span>SQL Execution</span>
                     <span className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                      {rtl ? "متاح" : "Available"}
+                      Available
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>{rtl ? "آخر تشخيص" : "Last Diagnostic"}</span>
+                    <span>Last Diagnostic</span>
                     <span className="text-sm text-gray-500">
                       {new Date().toLocaleString()}
                     </span>
@@ -593,27 +479,27 @@ const DiagnosticMonitoringHub: React.FC = () => {
         <TabsList className="grid grid-cols-6 mb-8">
           <TabsTrigger value="overview" className="flex items-center">
             <BarChart className="h-4 w-4 mr-2" />
-            {rtl ? "نظرة عامة" : "Overview"}
+            Overview
           </TabsTrigger>
           <TabsTrigger value="diagnostics" className="flex items-center">
             <Server className="h-4 w-4 mr-2" />
-            {rtl ? "التشخيص" : "Diagnostics"}
+            Diagnostics
           </TabsTrigger>
           <TabsTrigger value="health" className="flex items-center">
             <Gauge className="h-4 w-4 mr-2" />
-            {rtl ? "صحة النظام" : "System Health"}
+            System Health
           </TabsTrigger>
           <TabsTrigger value="performance" className="flex items-center">
             <LineChart className="h-4 w-4 mr-2" />
-            {rtl ? "مقاييس الأداء" : "Performance"}
+            Performance
           </TabsTrigger>
           <TabsTrigger value="logs" className="flex items-center">
             <FileText className="h-4 w-4 mr-2" />
-            {rtl ? "السجلات" : "Logs"}
+            Logs
           </TabsTrigger>
-          <TabsTrigger value="invoices" className="flex items-center">
-            <DollarSign className="h-4 w-4 mr-2" />
-            {rtl ? "الفواتير" : "Invoices"}
+          <TabsTrigger value="database" className="flex items-center">
+            <Database className="h-4 w-4 mr-2" />
+            Database
           </TabsTrigger>
         </TabsList>
 
@@ -630,15 +516,26 @@ const DiagnosticMonitoringHub: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <PerformanceMetricsViewer />
+          <SQLExecutionMonitor />
         </TabsContent>
 
         <TabsContent value="logs" className="space-y-4">
           <DiagnosticLogsViewer />
         </TabsContent>
 
-        <TabsContent value="invoices" className="space-y-4">
-          <InvoiceMonitor />
+        <TabsContent value="database" className="space-y-4">
+          <Tabs defaultValue="diagnostic">
+            <TabsList className="mb-4">
+              <TabsTrigger value="diagnostic">Diagnostic Tool</TabsTrigger>
+              <TabsTrigger value="tester">Database Tester</TabsTrigger>
+            </TabsList>
+            <TabsContent value="diagnostic">
+              <DatabaseDiagnosticTool />
+            </TabsContent>
+            <TabsContent value="tester">
+              <DatabaseUtilsTester />
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>

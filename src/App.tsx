@@ -30,6 +30,8 @@ import GitHubMigrationImporter from "@/components/GitHubMigrationImporter";
 import GitHubMigrationLogs from "@/components/GitHubMigrationLogs";
 import DiagnosticPanel from "@/components/DiagnosticPanel";
 import MigrationSystemInitializer from "@/components/MigrationSystemInitializer";
+import DiagnosticLogsViewer from "@/components/DiagnosticLogsViewer";
+import UnifiedOperationalMonitoringCenter from "@/components/UnifiedOperationalMonitoringCenter";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
 import UserAnalyticsDashboard from "@/frontend/modules/admin/components/UserAnalyticsDashboard";
 
@@ -205,6 +207,10 @@ function App() {
                 <Route
                   path="diagnostic-logs"
                   element={<DiagnosticLogsViewer />}
+                />
+                <Route
+                  path="monitoring-center"
+                  element={<UnifiedOperationalMonitoringCenter />}
                 />
               </Route>
               <Route

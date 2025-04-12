@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
   "Access-Control-Allow-Headers":
-    "Content-Type, Authorization, x-client-info, apikey",
+    "Content-Type, Authorization, x-client-info, apikey, content-type",
   "Access-Control-Max-Age": "86400",
 };
 
@@ -71,26 +71,17 @@ serve(async (req) => {
     // Method 1: Try pg_query
     try {
       method = "pg_query";
-      // Try multiple parameter names for compatibility
+      // Use only the correct parameter name
       let data, pgError;
       try {
-        // Try with 'sql' parameter first (as per the new function definition)
+        // Use only 'sql' parameter as per the function definition
         const result = await supabase.rpc("pg_query", {
           sql: sql,
         });
         data = result.data;
         pgError = result.error;
       } catch (err) {
-        // If that fails, try with 'query' parameter
-        try {
-          const result = await supabase.rpc("pg_query", {
-            query: sql,
-          });
-          data = result.data;
-          pgError = result.error;
-        } catch (innerErr) {
-          pgError = innerErr;
-        }
+        pgError = err;
       }
 
       if (!pgError) {
