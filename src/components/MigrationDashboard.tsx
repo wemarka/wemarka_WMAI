@@ -22,17 +22,22 @@ import {
   Code,
   Globe,
   Languages,
+  Search,
+  Server,
 } from "lucide-react";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
 import MigrationRunner from "./MigrationRunner";
 import GitHubMigrationImporter from "./GitHubMigrationImporter";
 import GitHubMigrationLogs from "./GitHubMigrationLogs";
+import DiagnosticPanel from "./DiagnosticPanel";
+import { Input } from "@/frontend/components/ui/input";
 
 const MigrationDashboard: React.FC = () => {
   const { toast } = useToast();
   const { direction, language } = useLanguage();
   const rtl = direction === "rtl";
   const [activeTab, setActiveTab] = useState<string>("runner");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Translations
   const translations = {
@@ -43,7 +48,9 @@ const MigrationDashboard: React.FC = () => {
     runner: rtl ? "منفذ SQL" : "SQL Runner",
     github: rtl ? "مستورد GitHub" : "GitHub Importer",
     logs: rtl ? "سجلات الترحيل" : "Migration Logs",
+    diagnostics: rtl ? "التشخيص" : "Diagnostics",
     settings: rtl ? "الإعدادات" : "Settings",
+    search: rtl ? "بحث..." : "Search...",
   };
 
   return (
@@ -58,13 +65,25 @@ const MigrationDashboard: React.FC = () => {
         </CardHeader>
 
         <CardContent className="p-0">
+          <div className="flex justify-between items-center mb-4">
+            <div className="relative w-full max-w-sm">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={translations.search}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+
           <Tabs
             defaultValue="runner"
             value={activeTab}
             onValueChange={setActiveTab}
             className="w-full"
           >
-            <TabsList className="grid grid-cols-3 lg:grid-cols-3 mb-8">
+            <TabsList className="grid grid-cols-4 lg:grid-cols-4 mb-8">
               <TabsTrigger value="runner" className="flex items-center">
                 <Code className="h-4 w-4 mr-2" />
                 {translations.runner}
@@ -77,6 +96,10 @@ const MigrationDashboard: React.FC = () => {
                 <History className="h-4 w-4 mr-2" />
                 {translations.logs}
               </TabsTrigger>
+              <TabsTrigger value="diagnostics" className="flex items-center">
+                <Server className="h-4 w-4 mr-2" />
+                {translations.diagnostics}
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="runner" className="mt-0">
@@ -88,7 +111,11 @@ const MigrationDashboard: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="logs" className="mt-0">
-              <GitHubMigrationLogs />
+              <GitHubMigrationLogs searchQuery={searchQuery} />
+            </TabsContent>
+
+            <TabsContent value="diagnostics" className="mt-0">
+              <DiagnosticPanel />
             </TabsContent>
           </Tabs>
         </CardContent>

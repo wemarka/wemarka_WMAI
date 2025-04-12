@@ -1,0 +1,6 @@
+{
+  "tasks": {
+    "deploy": "supabase functions deploy cors-test"
+  },
+  "importMap": "../import_map.json"
+}

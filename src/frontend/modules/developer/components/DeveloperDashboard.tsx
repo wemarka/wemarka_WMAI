@@ -16,6 +16,10 @@ import {
   Globe,
   Activity,
   BarChart,
+  Database,
+  Github,
+  Play,
+  History,
 } from "lucide-react";
 import ModuleLayout from "@/frontend/components/layout/ModuleLayout";
 import { useLanguage } from "@/frontend/contexts/LanguageContext";
@@ -152,6 +156,64 @@ const DeveloperDashboard = ({ isRTL = false }: DeveloperDashboardProps) => {
             <p className="text-muted-foreground">
               {isRTL ? "عرض سجلات التطوير" : "View development logs"}
             </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Database className="h-5 w-5 mr-2 rtl:ml-2 rtl:mr-0" />
+              {isRTL ? "إدارة الترحيل" : "Migration Management"}
+            </CardTitle>
+            <CardDescription>
+              {isRTL
+                ? "إدارة ترحيلات قاعدة البيانات وتتبع التغييرات"
+                : "Manage database migrations and track changes"}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">
+              {isRTL
+                ? "تشغيل استعلامات SQL المخصصة واستيراد ملفات الترحيل من GitHub وعرض سجلات الترحيل"
+                : "Run custom SQL queries, import migration files from GitHub, and view migration logs"}
+            </p>
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <Button
+                asChild
+                variant="outline"
+                className="flex items-center justify-center"
+              >
+                <Link to="/dashboard/developer/migration-runner">
+                  <Play className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                  {isRTL ? "منفذ SQL" : "SQL Runner"}
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="flex items-center justify-center"
+              >
+                <Link to="/dashboard/developer/github-importer">
+                  <Github className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                  {isRTL ? "مستورد GitHub" : "GitHub Importer"}
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="flex items-center justify-center"
+              >
+                <Link to="/dashboard/developer/migration-logs">
+                  <History className="h-4 w-4 mr-1 rtl:ml-1 rtl:mr-0" />
+                  {isRTL ? "سجلات الترحيل" : "Migration Logs"}
+                </Link>
+              </Button>
+            </div>
+            <Button asChild className="w-full">
+              <Link to="/dashboard/developer/migration-dashboard">
+                {isRTL ? "فتح لوحة تحكم الترحيل" : "Open Migration Dashboard"}
+              </Link>
+            </Button>
           </CardContent>
         </Card>
 

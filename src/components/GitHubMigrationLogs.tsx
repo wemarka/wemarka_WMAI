@@ -72,7 +72,13 @@ interface MigrationLog {
   created_at: string;
 }
 
-const GitHubMigrationLogs: React.FC = () => {
+interface GitHubMigrationLogsProps {
+  searchQuery?: string;
+}
+
+const GitHubMigrationLogs: React.FC<GitHubMigrationLogsProps> = ({
+  searchQuery: externalSearchQuery,
+}) => {
   const { toast } = useToast();
   const { direction } = useLanguage();
   const rtl = direction === "rtl";
@@ -93,6 +99,26 @@ const GitHubMigrationLogs: React.FC = () => {
     setError(null);
 
     try {
+      // First check if migration_logs table exists, create it if it doesn't
+      try {
+        console.log("Checking if migration_logs table exists...");
+        const createTableResult =
+          await migrationsApi.createMigrationLogsTable();
+        if (createTableResult.success) {
+          console.log("Migration logs table created or already exists");
+        } else {
+          console.warn(
+            "Note: Failed to create migration_logs table:",
+            createTableResult.error,
+          );
+        }
+      } catch (tableError) {
+        console.error(
+          "Error checking/creating migration_logs table:",
+          tableError,
+        );
+      }
+
       const result = await migrationsApi.getMigrationLogs();
 
       if (result.success) {
@@ -125,6 +151,13 @@ const GitHubMigrationLogs: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Update internal search query when external one changes
+  useEffect(() => {
+    if (externalSearchQuery !== undefined) {
+      setSearchQuery(externalSearchQuery);
+    }
+  }, [externalSearchQuery]);
 
   // Apply filters and sorting
   useEffect(() => {
