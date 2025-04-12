@@ -24,6 +24,11 @@ import {
   RoadmapIntegrationDashboard,
   ModuleIntegrationVisualization,
 } from "@/frontend/modules/developer";
+import MigrationDashboard from "@/components/MigrationDashboard";
+import MigrationRunner from "@/components/MigrationRunner";
+import GitHubMigrationImporter from "@/components/GitHubMigrationImporter";
+import GitHubMigrationLogs from "@/components/GitHubMigrationLogs";
+import DiagnosticPanel from "@/components/DiagnosticPanel";
 import SettingsDashboard from "@/frontend/modules/settings/components/SettingsDashboard";
 import UserAnalyticsDashboard from "@/frontend/modules/admin/components/UserAnalyticsDashboard";
 
@@ -178,6 +183,20 @@ function App() {
                   path="integration-visualization"
                   element={<ModuleIntegrationVisualization isRTL={false} />}
                 />
+                <Route
+                  path="migration-dashboard"
+                  element={<MigrationDashboard />}
+                />
+                <Route path="migration-runner" element={<MigrationRunner />} />
+                <Route
+                  path="github-importer"
+                  element={<GitHubMigrationImporter />}
+                />
+                <Route
+                  path="migration-logs"
+                  element={<GitHubMigrationLogs />}
+                />
+                <Route path="diagnostics" element={<DiagnosticPanel />} />
               </Route>
               <Route
                 path="dashboard/settings/*"
